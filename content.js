@@ -6,7 +6,7 @@ const processedElements = new WeakSet();
 // so you don't hit API rate limits by scanning hundreds of elements at once.
 async function scanPage() {
 
-    const paragraphs = document.querySelectorAll('p, h1, h2, h3, span, div, a');
+    const paragraphs = document.querySelectorAll('p, h1, h2, h3, span, a');
 
     // Only look at elements we haven't already processed, and cap the batch size
     // to save API calls when a lot of new content loads at once.
