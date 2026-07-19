@@ -10,10 +10,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const textToCheck = request.text;
         
         // The prompt asks Gemini to classify the text and return JSON
-        const prompt = `Analyze the following text. Does it contain information that makes the reader feel bad/negative, OR is it considered "useless information"?
+        const prompt = `Analyze the following text. Does it contain information that makes the reader feel bad/negative, OR is it considered "useless information" / manipulative engagement-bait?
         Evaluate as TRUE if the text meets ANY of the following criteria:
         1. Negative/Bad Feelings: The content is toxic, distressing, depressing, fear-mongering, or designed to make the reader feel upset, angry, or anxious.
         2. Useless Information: The content is "trash news", clickbait, petty gossip, sensationalized trivial matters, or uses manipulative tactics like withholding information just to force a click.
+        3. Engagement-Bait Structure: The text is structurally engineered to farm clicks/comments/shares rather than to inform, e.g. it shows several of:
+           - An extreme/absolute hook line, a shocking number, or a dangling question up front.
+           - A "curiosity gap" that deliberately withholds the core information until the end or behind "read more" / "see more".
+           - Choppy pacing: very short sentences and frequent line breaks written for fast scrolling rather than readability.
+           - Trigger words like "secret", "truth", "warning", "shocking", "you won't believe", "don't miss this" (including equivalents in other languages, e.g. Vietnamese "bí mật", "sự thật", "cảnh báo", "kinh hoàng", "không ngờ", "đừng bỏ lỡ").
+           - An unresolved/incomplete story clearly meant to provoke comments or follows, or an extreme one-sided opinion meant to provoke outrage or arguing.
+           - Heavy use of attention-grabbing emoji (e.g. 🚨 🛑 😱 👇) used to break up lines rather than convey meaning.
         Text: "${textToCheck}"`;
   
         try {
