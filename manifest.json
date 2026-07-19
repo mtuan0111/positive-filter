@@ -1,0 +1,20 @@
+{
+    "manifest_version": 3,
+    "name": "Gemini Positivity Filter",
+    "version": "1.0",
+    "description": "Filters negative text on web pages using Gemini 1.5 Flash.",
+    "permissions": ["storage"],
+    "host_permissions": ["<all_urls>"],
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"]
+      }
+    ]
+  }
