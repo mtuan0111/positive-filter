@@ -11,10 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('flagPromptApiBtn').addEventListener('click', () => {
     chrome.tabs.create({ url: 'chrome://flags/#prompt-api-for-gemini-nano' });
   });
-
-  document.getElementById('relaunchChromeBtn').addEventListener('click', () => {
-    chrome.tabs.create({ url: 'chrome://restart' });
-  });
 });
 
 async function checkNanoStatus() {
@@ -23,18 +19,18 @@ async function checkNanoStatus() {
   const statusEl = document.getElementById('nanoStatus');
 
   try {
-    if (window.ai) {
+    if (window.LanguageModel) {
       promptIcon.textContent = '✅';
-      
+
       let isReady = 'no';
-      if (window.ai.languageModel && typeof window.ai.languageModel.capabilities === 'function') {
-        const capabilities = await window.ai.languageModel.capabilities();
-        isReady = capabilities.available;
-      } else if (typeof window.ai.canCreateTextSession === 'function') {
-        isReady = await window.ai.canCreateTextSession();
+      if (typeof window.LanguageModel.availability === 'function') {
+        const availability = await window.LanguageModel.availability();
+        isReady = availability;
+      } else if (typeof window.canCreateTextSession === 'function') {
+        isReady = await window.canCreateTextSession();
       }
-      
-      if (isReady === 'readily' || isReady === 'after-download') {
+
+      if (isReady === 'available' || isReady === 'readily' || isReady === 'after-download') {
         optIcon.textContent = '✅';
         statusEl.textContent = 'Gemini Nano is ready to use!';
         statusEl.style.color = 'green';
