@@ -12,12 +12,6 @@
   </style>
 </head>
 <body>
-  <h3>Settings</h3>
-  <label for="apiKey">Gemini API Key:</label>
-  <input type="password" id="apiKey" placeholder="Enter your API key">
-  <button id="saveBtn">Save Key</button>
-  <p id="status"></p>
-
   <h3>Allowed Websites</h3>
   <p class="hint">The filter only runs on sites listed here. Enter a domain (e.g. example.com) or a match pattern (e.g. *://*.example.com/*).</p>
   <input type="text" id="urlInput" placeholder="example.com">
@@ -25,6 +19,13 @@
   <button id="addCurrentBtn">Add This Website</button>
   <p id="urlStatus"></p>
   <ul id="urlList"></ul>
+
+  <hr style="margin: 15px 0;">
+  <h3>Gemini Nano Setup</h3>
+  <p class="hint">Enable these flags to use on-device Gemini Nano.</p>
+  <button id="flagOptimizationBtn">Enable Optimization Guide</button>
+  <button id="flagPromptApiBtn">Enable Prompt API</button>
+  <button id="relaunchChromeBtn">Restart Chrome</button>
 
   <script type="module" src="popup.js"></script>
 </body>
