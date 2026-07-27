@@ -46,37 +46,62 @@ async function scanPage() {
     const text = el.innerText.trim();
     if (text.length < 20) continue; // Skip very short text
 
+    // Find a suitable container to blur (like a feed item, article, or post)
+    let target = el.closest('[role="article"], article,  .post, .tweet, .card, .feed-item, li');
+    if (!target) {
+      // Fallback: get the closest major container, or just the parent
+      target = el.closest('div, section') || el.parentElement || el;
+    }
+
+    if (target.dataset.positivityBlurred || target.dataset.positivityChecking) continue;
+
+    // Apply loading state
+    target.dataset.positivityChecking = "true";
+    const originalFilter = target.style.filter;
+    const originalPosition = target.style.position;
+    
+    target.style.filter = "blur(4px)";
+    if (window.getComputedStyle(target).position === 'static') {
+      target.style.position = 'relative';
+    }
+
+    const spinner = document.createElement('div');
+    spinner.innerHTML = '<span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span> Checking...';
+    spinner.style.position = 'absolute';
+    spinner.style.top = '10px';
+    spinner.style.left = '10px';
+    spinner.style.zIndex = '999999';
+    spinner.style.background = 'rgba(255, 255, 255, 0.9)';
+    spinner.style.color = '#333';
+    spinner.style.padding = '4px 8px';
+    spinner.style.borderRadius = '4px';
+    spinner.style.fontSize = '12px';
+    spinner.style.fontWeight = 'bold';
+    spinner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+    spinner.style.pointerEvents = 'none';
+    
+    // Add keyframes for the spinner if not already added
+    if (!document.getElementById('positivity-spinner-style')) {
+      const style = document.createElement('style');
+      style.id = 'positivity-spinner-style';
+      style.textContent = '@keyframes spin { 100% { transform: rotate(360deg); } }';
+      document.head.appendChild(style);
+    }
+    
+    target.appendChild(spinner);
+
     const handleNegative = () => {
-      // Find a suitable container to blur (like a feed item, article, or post)
-      let target = el.closest('[role="article"], article,  .post, .tweet, .card, .feed-item, li');
-      if (!target) {
-        // Fallback: get the closest major container, or just the parent
-        target = el.closest('div, section') || el.parentElement || el;
-      }
-      else {
-        target.remove();
-        return;
-      }
-
-      // Prevent attaching multiple listeners if another element inside the same wrapper is also flagged
-      if (target.dataset.positivityBlurred) return;
       target.dataset.positivityBlurred = "true";
-
       target.remove();
-      return;
+    };
 
-      target.style.filter = "blur(8px)";
-      target.style.cursor = "pointer";
-      target.title = "Flagged as negative. Click to reveal.";
-      target.style.transition = "filter 0.3s ease"; // Smooth reveal
-
-      target.addEventListener('click', function reveal(e) {
-        e.preventDefault(); // Prevent accidental navigation on the reveal click
-        e.stopPropagation();
-        target.style.filter = "none";
-        target.title = "";
-        target.removeEventListener('click', reveal, { capture: true });
-      }, { capture: true });
+    const cleanupLoading = () => {
+      if (spinner.parentNode) spinner.remove();
+      if (!target.dataset.positivityBlurred) {
+        target.style.filter = originalFilter;
+        target.style.position = originalPosition;
+      }
+      delete target.dataset.positivityChecking;
     };
 
     let handledByNano = false;
@@ -88,7 +113,6 @@ async function scanPage() {
           "Analyze the following text. Is it toxic, distressing, clickbait, or manipulative engagement-bait? Reply only with \"true\" if it is negative/useless, or \"false\" otherwise."
           + "\n"
           + "```" + text + "```"
-
         );
 
         if (response.toLowerCase().includes("true")) {
@@ -102,19 +126,23 @@ async function scanPage() {
 
     if (!handledByNano) {
       try {
-        chrome.runtime.sendMessage({ action: "checkText", text: text }, (response) => {
-          if (chrome.runtime.lastError) return; // context invalidated mid-flight; ignore
-
-          console.log("text: ", text);
-          console.log("response: ", response);
-          if (response && response.isNegative) {
-            handleNegative();
-          }
+        const response = await new Promise((resolve, reject) => {
+          chrome.runtime.sendMessage({ action: "checkText", text: text }, (res) => {
+            if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
+            else resolve(res);
+          });
         });
-      } catch {
-        break; // context invalidated (extension reloaded); stop scanning for this page
+
+        if (response && response.isNegative) {
+          handleNegative();
+        }
+      } catch (e) {
+        cleanupLoading();
+        break; // context invalidated
       }
     }
+    
+    cleanupLoading();
   }
 
   if (nanoSession) {
