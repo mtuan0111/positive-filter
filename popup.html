@@ -13,8 +13,41 @@
     button {
       width: 100%;
       margin-top: 10px;
-      padding: 8px;
+      padding: 10px;
       box-sizing: border-box;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    button {
+      background-color: #f1f3f4;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      color: #3c4043;
+    }
+
+    button:hover {
+      background-color: #e8eaed;
+      transform: translateY(-1px);
+    }
+
+    input:focus {
+      border-color: #1a73e8;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+    }
+
+    /* Primary button style */
+    #addCurrentBtn {
+      background-color: #1a73e8;
+      color: white;
+    }
+
+    #addCurrentBtn:hover {
+      background-color: #1557b0;
     }
 
     h3 {
