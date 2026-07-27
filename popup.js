@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function checkNanoStatus() {
   const promptIcon = document.getElementById('promptIcon');
   const optIcon = document.getElementById('optIcon');
-  const statusEl = document.getElementById('urlStatus'); // Using existing element for debug
+  const statusEl = document.getElementById('nanoStatus');
 
   try {
     if (window.ai) {

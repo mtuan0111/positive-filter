@@ -12,20 +12,36 @@
   </style>
 </head>
 <body>
-  <h3>Allowed Websites</h3>
-  <p class="hint">The filter only runs on sites listed here. Enter a domain (e.g. example.com) or a match pattern (e.g. *://*.example.com/*).</p>
-  <input type="text" id="urlInput" placeholder="example.com">
-  <button id="addUrlBtn">Add Website</button>
-  <button id="addCurrentBtn">Add This Website</button>
-  <p id="urlStatus"></p>
-  <ul id="urlList"></ul>
+  <div class="header">
+    <h3 style="margin-top:0;">Gemini Positivity Filter</h3>
+  </div>
+
+  <div style="background-color: #e8f0fe; padding: 10px; border-radius: 6px; font-size: 11px; color: #1a73e8; margin-bottom: 15px; line-height: 1.4;">
+    <strong>🛡️ 100% Private & Offline:</strong> This extension uses Chrome's built-in AI (Gemini Nano). It runs entirely on your local PC, so your reading data never leaves your device. It may use some PC resources while running, but it actively protects you by removing toxic information and preserving positive content.
+  </div>
+
+  <div class="section">
+    <h4>⚙️ 1. AI Setup</h4>
+    <p class="hint">Click to open Chrome flags. Set to exact values:</p>
+    <button id="flagOptimizationBtn"><span id="optIcon">❓</span> Optimization Guide (BypassPerfRequirement)</button>
+    <button id="flagPromptApiBtn"><span id="promptIcon">❓</span> Prompt API (Enabled)</button>
+    <button id="relaunchChromeBtn" style="background:#e0e0e0; font-weight:bold;">Restart Chrome</button>
+    <p id="nanoStatus" class="hint" style="margin-top:8px; font-weight:bold;"></p>
+  </div>
 
   <hr style="margin: 15px 0;">
-  <h3>Gemini Nano Setup</h3>
-  <p class="hint">Enable these flags to use on-device Gemini Nano.</p>
-  <button id="flagOptimizationBtn"><span id="optIcon">❓</span> Optimization Guide (Set to: Enabled BypassPerfRequirement)</button>
-  <button id="flagPromptApiBtn"><span id="promptIcon">❓</span> Prompt API for Gemini Nano (Set to: Enabled)</button>
-  <button id="relaunchChromeBtn">Restart Chrome</button>
+
+  <div class="section">
+    <h4>🌐 2. Active Websites</h4>
+    <p class="hint">The filter only runs on these specific websites:</p>
+    <div style="display:flex; gap:5px; margin-top:10px;">
+      <input type="text" id="urlInput" placeholder="example.com" style="margin-top:0;">
+      <button id="addUrlBtn" style="margin-top:0; width:50px;">Add</button>
+    </div>
+    <button id="addCurrentBtn">Add Current Tab</button>
+    <p id="urlStatus" class="hint" style="color:red;"></p>
+    <ul id="urlList"></ul>
+  </div>
 
   <script type="module" src="popup.js"></script>
 </body>
