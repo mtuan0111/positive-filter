@@ -9,8 +9,9 @@ A privacy-first Chrome Extension that uses Chrome's built-in on-device AI (Gemin
 - **100% Private & Offline**: Uses Gemini Nano (Chrome's local AI model). No data is sent to the cloud.
 - **Dynamic Content Filtering**: Automatically scans and removes toxic content, clickbait, and engagement-bait as you scroll.
 - **Custom AI Rules**: Define exactly what "negative" means to you using your own custom prompt rules.
-- **Targeted Activation**: Only runs on the specific websites you choose, preserving performance on other sites.
+- **Targeted Activation**: Only runs on the specific websites you choose, preserving performance on other sites — a handful of common social sites (Facebook, X/Twitter, Instagram, Quora, TikTok) are pre-added by default on install, and you can add/remove sites freely.
 - **Visual Feedback**: Shows a loading overlay and a subtle blur while content is being analyzed.
+- **Blocked Content Log**: Keeps a running count and recent history of what's been filtered out, viewable (and clearable) right in the popup.
 
 ## Installation
 
@@ -50,7 +51,15 @@ You can tell the AI exactly what to look for.
 
 1. In the extension popup, go to **3. Custom AI Rules**.
 2. Type in your custom criteria (e.g., "Filter out any posts about politics or natural disasters").
-3. Click **Save Prompt**. The AI will now use your custom rules to evaluate content on your active websites.
+3. Click **Save Prompt**. The AI will now use your custom rules to evaluate content on your active websites. (Saving or resetting the prompt also clears previously cached results, since old verdicts were made under the old rules.)
+
+### 4. Review Blocked Content
+
+Every time the filter removes something, it's logged for you to review.
+
+1. Open the extension popup and scroll to **4. Blocked Content**.
+2. See a running count and a list of recently filtered items (with timestamp and site).
+3. Click **Clear Log** to reset the count and history.
 
 ## Architecture & Development
 
