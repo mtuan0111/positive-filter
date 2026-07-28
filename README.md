@@ -44,6 +44,7 @@ To save system resources, the filter only runs on websites you explicitly allow.
 1. Navigate to a website where you want to filter negativity (e.g., a news site or social media feed).
 2. Open the extension popup and click **Add Current Tab** under the **2. Active Websites** section.
 3. Alternatively, you can type a domain manually (e.g., `x.com`) and click **Add**.
+4. Adding a domain automatically covers all its subdomains too (e.g. adding `facebook.com` also matches `m.facebook.com`, `www.facebook.com`, etc.), so you don't need to add each one separately.
 
 ### 3. Customize Your Rules (Optional)
 
