@@ -95,7 +95,7 @@ Look specifically for:
     overlay.style.height = '100%';
     overlay.style.backdropFilter = 'blur(8px)';
     overlay.style.WebkitBackdropFilter = 'blur(8px)';
-    overlay.style.backgroundColor = 'rgba(230, 230, 230, 0.4)';
+    overlay.style.backgroundColor = 'var(--pf-overlay-bg, rgba(230, 230, 230, 0.4))';
     overlay.style.zIndex = '999998';
     overlay.style.pointerEvents = 'none';
     overlay.style.transition = 'all 0.3s ease';
@@ -111,8 +111,8 @@ Look specifically for:
     spinner.style.top = '10px';
     spinner.style.left = '10px';
     spinner.style.zIndex = '999999';
-    spinner.style.background = 'rgba(255, 255, 255, 0.9)';
-    spinner.style.color = '#333';
+    spinner.style.background = 'var(--pf-spinner-bg, rgba(255, 255, 255, 0.9))';
+    spinner.style.color = 'var(--pf-text, #333)';
     spinner.style.padding = '4px 8px';
     spinner.style.borderRadius = '4px';
     spinner.style.fontSize = '14px';
@@ -125,6 +125,27 @@ Look specifically for:
       const style = document.createElement('style');
       style.id = 'positivity-animation-style';
       style.textContent = `
+        :root {
+          --pf-primary: #1a73e8;
+          --pf-primary-hover: #1557b0;
+          --pf-primary-light: #e8f0fe;
+          --pf-bg: #ffffff;
+          --pf-bg-secondary: #f8f9fa;
+          --pf-bg-tertiary: #f1f3f4;
+          --pf-border: #dddddd;
+          --pf-text: #333333;
+          --pf-text-secondary: #555555;
+          --pf-text-tertiary: #666666;
+          --pf-text-muted: #999999;
+          --pf-warning: #e65100;
+          --pf-warning-bg: #fff3e0;
+          --pf-success: #0f9d58;
+          --pf-success-dark: #155724;
+          --pf-success-bg: #d4edda;
+          --pf-overlay-bg: rgba(230, 230, 230, 0.4);
+          --pf-overlay-success-bg: rgba(200, 255, 200, 0.2);
+          --pf-spinner-bg: rgba(255, 255, 255, 0.9);
+        }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         @keyframes positivity-pulse {
           0% { opacity: 0.6; }
@@ -176,8 +197,8 @@ Look specifically for:
         overlay.style.backgroundColor = 'transparent';
         
         spinner.innerHTML = '<span style="font-size: 14px;">✅</span> Safe';
-        spinner.style.color = '#155724';
-        spinner.style.background = '#d4edda';
+        spinner.style.color = 'var(--pf-success-dark, #155724)';
+        spinner.style.background = 'var(--pf-success-bg, #d4edda)';
         
         setTimeout(() => {
           if (overlay.parentNode) overlay.remove();

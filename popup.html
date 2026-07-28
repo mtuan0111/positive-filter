@@ -3,6 +3,28 @@
 
 <head>
   <style>
+    :root {
+      --pf-primary: #1a73e8;
+      --pf-primary-hover: #1557b0;
+      --pf-primary-light: #e8f0fe;
+      --pf-bg: #ffffff;
+      --pf-bg-secondary: #f8f9fa;
+      --pf-bg-tertiary: #f1f3f4;
+      --pf-border: #dddddd;
+      --pf-text: #333333;
+      --pf-text-secondary: #555555;
+      --pf-text-tertiary: #666666;
+      --pf-text-muted: #999999;
+      --pf-warning: #e65100;
+      --pf-warning-bg: #fff3e0;
+      --pf-success: #0f9d58;
+      --pf-success-dark: #155724;
+      --pf-success-bg: #d4edda;
+      --pf-overlay-bg: rgba(230, 230, 230, 0.4);
+      --pf-overlay-success-bg: rgba(200, 255, 200, 0.2);
+      --pf-spinner-bg: rgba(255, 255, 255, 0.9);
+    }
+
     body {
       width: 280px;
       padding: 15px;
@@ -16,17 +38,17 @@
       padding: 10px;
       box-sizing: border-box;
       border-radius: 8px;
-      border: 1px solid #ddd;
+      border: 1px solid var(--pf-border);
       font-family: inherit;
       transition: all 0.2s ease;
     }
 
     button {
-      background-color: #f1f3f4;
+      background-color: var(--pf-bg-tertiary);
       border: none;
       cursor: pointer;
       font-weight: 500;
-      color: #3c4043;
+      color: var(--pf-text-secondary);
     }
 
     button:hover {
@@ -34,29 +56,30 @@
       transform: translateY(-1px);
     }
 
-    input:focus {
-      border-color: #1a73e8;
+    input:focus, textarea:focus {
+      border-color: var(--pf-primary);
       outline: none;
       box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
     }
 
     /* Primary button style */
-    #addCurrentBtn {
-      background-color: #1a73e8;
+    #addCurrentBtn, #savePromptBtn {
+      background-color: var(--pf-primary);
       color: white;
     }
 
-    #addCurrentBtn:hover {
-      background-color: #1557b0;
+    #addCurrentBtn:hover, #savePromptBtn:hover {
+      background-color: var(--pf-primary-hover);
     }
 
-    h3 {
+    h3, h4 {
       margin-bottom: 5px;
+      color: var(--pf-text);
     }
 
     .hint {
       font-size: 11px;
-      color: #666;
+      color: var(--pf-text-tertiary);
       margin: 4px 0 0;
     }
 
@@ -97,10 +120,12 @@
   </div>
 
   <div
-    style="background-color: #e8f0fe; padding: 10px; border-radius: 6px; font-size: 11px; color: #1a73e8; margin-bottom: 15px; line-height: 1.4;">
+  <div
+    style="background-color: var(--pf-primary-light); padding: 10px; border-radius: 6px; font-size: 11px; color: var(--pf-primary); margin-bottom: 15px; line-height: 1.4;">
     <strong>100% Private & Offline:</strong> This extension uses Chrome's built-in AI (Gemini Nano). It runs
-    entirely on your local PC, so your reading data never leaves your device. It may use some PC resources while
-    running, but it actively protects you by removing toxic information and preserving positive content.
+    entirely on your local PC, so your reading data never leaves your device.
+    <br><br>
+    <strong>Note:</strong> Currently, this filter only analyzes <strong>text</strong>. It does not support scanning pictures or videos yet, but we hope to add that capability soon!
   </div>
 
   <div class="section">
@@ -108,12 +133,12 @@
     <p class="hint">Click to open Chrome flags. Set to exact values:</p>
     <button id="flagOptimizationBtn"><span id="optIcon">❓</span> Optimization Guide (BypassPerfRequirement)</button>
     <button id="flagPromptApiBtn"><span id="promptIcon">❓</span> Prompt API (Enabled)</button>
-    <p id="restartNote" class="hint" style="margin-top:8px; padding: 6px; background: #fff3e0; border-radius: 4px; color: #e65100;">
+    <p id="restartNote" class="hint" style="margin-top:8px; padding: 6px; background: var(--pf-warning-bg); border-radius: 4px; color: var(--pf-warning);">
       <strong>Note:</strong> After enabling these flags, you must manually restart Chrome completely (close all windows
       and reopen) for them to take effect.
     </p>
 
-    <p id="disableTip" class="hint" style="margin-top:8px; padding: 6px; background: #e8f0fe; border-radius: 4px; color: #1a73e8; display:none;">
+    <p id="disableTip" class="hint" style="margin-top:8px; padding: 6px; background: var(--pf-primary-light); border-radius: 4px; color: var(--pf-primary); display:none;">
       <strong>Tip:</strong> If you ever disable or uninstall this extension, it is recommended to disable the flags
       above to restore optimal browser performance.
     </p>
@@ -141,12 +166,12 @@
     <p class="hint">Define what makes text "negative" for you. The Gemini Nano AI will use these rules to filter
       content.</p>
     <textarea id="promptInput" rows="4"
-      style="width:100%; margin-top:10px; padding:10px; box-sizing:border-box; border-radius:8px; border:1px solid #ddd; font-family:inherit; resize:vertical;"></textarea>
+      style="width:100%; margin-top:10px; padding:10px; box-sizing:border-box; border-radius:8px; border:1px solid var(--pf-border); font-family:inherit; resize:vertical;"></textarea>
     <div style="display:flex; gap:5px;">
-      <button id="savePromptBtn" style="background-color:#1a73e8; color:white;">Save Prompt</button>
+      <button id="savePromptBtn">Save Prompt</button>
       <button id="resetPromptBtn">Reset</button>
     </div>
-    <p id="promptStatus" class="hint" style="color:green; display:none;">Saved!</p>
+    <p id="promptStatus" class="hint" style="color:var(--pf-success); display:none;">Saved!</p>
   </div>
 
   <hr style="margin: 15px 0;">
@@ -154,13 +179,13 @@
   <div class="section">
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <h4>4. Blocked Content</h4>
-      <span id="blockedCount" style="background: #e65100; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">0</span>
+      <span id="blockedCount" style="background: var(--pf-warning); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">0</span>
     </div>
     <p class="hint">Recently filtered negative content:</p>
-    <div id="blockedList" style="max-height: 150px; overflow-y: auto; background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px; padding: 8px; margin-top: 10px; font-size: 11px; color: #555;">
-      <em style="color: #999;">No content blocked yet.</em>
+    <div id="blockedList" style="max-height: 150px; overflow-y: auto; background: var(--pf-bg-secondary); border: 1px solid var(--pf-border); border-radius: 6px; padding: 8px; margin-top: 10px; font-size: 11px; color: var(--pf-text-secondary);">
+      <em style="color: var(--pf-text-muted);">No content blocked yet.</em>
     </div>
-    <button id="clearLogBtn" style="margin-top: 10px; width: 100%; background-color: #f1f3f4; color: #3c4043;">Clear Log</button>
+    <button id="clearLogBtn" style="margin-top: 10px; width: 100%;">Clear Log</button>
   </div>
 
   <hr style="margin: 15px 0;">
