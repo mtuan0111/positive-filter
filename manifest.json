@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Gemini Positivity Filter",
   "version": "1.0",
-  "description": "Filters negative text on web pages using Gemini 1.5 Flash.",
+  "description": "Securely filters negative text on web pages completely offline using Chrome's built-in Gemini Nano AI.",
   "permissions": [
     "storage",
     "scripting",
