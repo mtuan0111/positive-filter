@@ -79,9 +79,19 @@ function initCustomPrompt() {
     promptInput.value = result.customPrompt || DEFAULT_PROMPT;
   });
 
+  function clearCache() {
+    chrome.storage.local.get(null, (items) => {
+      const cacheKeys = Object.keys(items).filter(k => k.startsWith('nanoCache_') || k.startsWith('textCache_'));
+      if (cacheKeys.length > 0) {
+        chrome.storage.local.remove(cacheKeys);
+      }
+    });
+  }
+
   saveBtn.addEventListener('click', () => {
     const val = promptInput.value.trim() || DEFAULT_PROMPT;
     chrome.storage.local.set({ customPrompt: val }, () => {
+      clearCache();
       statusEl.style.display = 'block';
       setTimeout(() => statusEl.style.display = 'none', 2000);
     });
@@ -89,7 +99,7 @@ function initCustomPrompt() {
 
   resetBtn.addEventListener('click', () => {
     promptInput.value = DEFAULT_PROMPT;
-    chrome.storage.local.set({ customPrompt: DEFAULT_PROMPT });
+    chrome.storage.local.set({ customPrompt: DEFAULT_PROMPT }, clearCache);
   });
 }
 

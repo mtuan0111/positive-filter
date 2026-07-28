@@ -1,6 +1,13 @@
 // Elements we've already sent to the background script, so re-scans triggered by
 // scrolling/lazy-loaded content don't re-check the same text repeatedly.
 const processedElements = new WeakSet();
+const CACHE_KEY_PREFIX = "nanoCache_";
+
+async function hashText(text) {
+  const data = new TextEncoder().encode(text);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
 
 // A simple function to scan paragraphs. In a real app, you'd want to optimize this
 // so you don't hit API rate limits by scanning hundreds of elements at once.
@@ -130,17 +137,24 @@ Look specifically for:
     };
 
     let handledByNano = false;
-    console.log("nanoSession: ", nanoSession);
-    if (nanoSession) {
+    let isNegativeResult = false;
+    let wasCached = false;
+
+    const cacheKey = CACHE_KEY_PREFIX + await hashText(text);
+    const cached = await chrome.storage.local.get([cacheKey]);
+
+    if (cached[cacheKey] !== undefined) {
+      isNegativeResult = cached[cacheKey];
+      wasCached = true;
+      handledByNano = true;
+    } else if (nanoSession) {
       try {
         console.log("text to analyze: ", text);
         const response = await nanoSession.prompt(
           `You are a content filtering assistant. ${basePrompt}\n\nReply ONLY with "true" if the text violates the criteria, or "false" otherwise. Do not explain.\nText:\n\`\`\`${text}\`\`\``
         );
 
-        if (response.toLowerCase().includes("true")) {
-          handleNegative();
-        }
+        isNegativeResult = response.toLowerCase().includes("true");
         handledByNano = true;
       } catch (error) {
         console.error("Error executing Nano prompt:", error);
@@ -156,13 +170,21 @@ Look specifically for:
           });
         });
 
-        if (response && response.isNegative) {
-          handleNegative();
+        if (response && response.isNegative !== undefined) {
+          isNegativeResult = response.isNegative;
         }
       } catch (e) {
         cleanupLoading();
         break; // context invalidated
       }
+    }
+
+    if (!wasCached && (handledByNano || isNegativeResult !== false)) {
+      chrome.storage.local.set({ [cacheKey]: isNegativeResult });
+    }
+
+    if (isNegativeResult) {
+      handleNegative();
     }
 
     cleanupLoading();
