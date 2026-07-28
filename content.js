@@ -5,6 +5,8 @@ const processedElements = new WeakSet();
 // A simple function to scan paragraphs. In a real app, you'd want to optimize this
 // so you don't hit API rate limits by scanning hundreds of elements at once.
 async function scanPage() {
+
+
   // Once the extension is reloaded/updated (common during development), this page's
   // content script is orphaned -- chrome.runtime is torn down and calling into it
   // throws "Extension context invalidated". Bail out rather than crash on every scan.
@@ -17,8 +19,6 @@ async function scanPage() {
   const elementsToCheck = Array.from(paragraphs)
     .filter(el => !processedElements.has(el))
     .slice(0, 50);
-
-  console.log("elementsToCheck: ", elementsToCheck);
 
   if (elementsToCheck.length === 0) return;
 
@@ -57,7 +57,7 @@ async function scanPage() {
     // Apply loading state
     target.dataset.positivityChecking = "true";
     const originalPosition = target.style.position;
-    
+
     if (window.getComputedStyle(target).position === 'static') {
       target.style.position = 'relative';
     }
@@ -91,7 +91,7 @@ async function scanPage() {
     spinner.style.fontSize = '12px';
     spinner.style.fontWeight = 'bold';
     spinner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
-    
+
     // Add keyframes for the spinner if not already added
     if (!document.getElementById('positivity-spinner-style')) {
       const style = document.createElement('style');
@@ -99,7 +99,7 @@ async function scanPage() {
       style.textContent = '@keyframes spin { 100% { transform: rotate(360deg); } }';
       document.head.appendChild(style);
     }
-    
+
     overlay.appendChild(spinner);
     target.appendChild(overlay);
 
@@ -151,7 +151,7 @@ async function scanPage() {
         break; // context invalidated
       }
     }
-    
+
     cleanupLoading();
   }
 

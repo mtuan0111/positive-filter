@@ -47,11 +47,12 @@ export function initAllowedSites() {
   }
 
   const DEFAULT_SITES = [
-    "*://facebook.com/*",
-    "*://x.com/*",
-    "*://instagram.com/*",
-    "*://quora.com/*",
-    "*://tiktok.com/*"
+    "*://*.facebook.com/*",
+    "*://*.x.com/*",
+    "*://*.twitter.com/*",
+    "*://*.instagram.com/*",
+    "*://*.quora.com/*",
+    "*://*.tiktok.com/*"
   ];
 
   chrome.storage.local.get(['allowedUrls'], (result) => {

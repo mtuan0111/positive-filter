@@ -2,11 +2,12 @@ import { classifyText } from './lib/classifier.js';
 import { syncContentScripts } from './lib/contentScriptSync.js';
 
 const DEFAULT_SITES = [
-  "*://facebook.com/*",
-  "*://x.com/*",
-  "*://instagram.com/*",
-  "*://quora.com/*",
-  "*://tiktok.com/*"
+  "*://*.facebook.com/*",
+  "*://*.x.com/*",
+  "*://*.twitter.com/*",
+  "*://*.instagram.com/*",
+  "*://*.quora.com/*",
+  "*://*.tiktok.com/*"
 ];
 
 chrome.runtime.onInstalled.addListener(() => {
