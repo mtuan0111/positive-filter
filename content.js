@@ -22,8 +22,16 @@ async function scanPage() {
 
   if (elementsToCheck.length === 0) return;
 
+  const newlyBlocked = [];
+
   const { customPrompt } = await chrome.storage.local.get(['customPrompt']);
-  const basePrompt = customPrompt || "Analyze the following text. Is it toxic, distressing, clickbait, or manipulative engagement-bait?";
+  const basePrompt = customPrompt || `Analyze the following text. Act as an expert Trust and Safety Content Moderator. Analyze the following text and determine if it contains any harmful elements.
+
+Look specifically for:
+1. Toxicity: Insults, hate speech, harassment, profanity, or aggressive tone.
+2. Distressing Content: Violence, self-harm references, or extreme negativity/doomscrolling material.
+3. Clickbait: Sensationalized language, exaggerated claims, or intentionally withholding key information to force a click.
+4. Manipulative Engagement-Bait: Guilt-tripping, fear-mongering, forced sharing (e.g., 'share if you care'), or false urgency.`;
 
   let nanoSession = null;
   try {
@@ -106,6 +114,11 @@ async function scanPage() {
     const handleNegative = () => {
       target.dataset.positivityBlurred = "true";
       target.remove();
+      newlyBlocked.push({ 
+        text: text.length > 100 ? text.substring(0, 100) + "..." : text, 
+        timestamp: Date.now(),
+        domain: window.location.hostname
+      });
     };
 
     const cleanupLoading = () => {
@@ -157,6 +170,15 @@ async function scanPage() {
 
   if (nanoSession) {
     nanoSession.destroy();
+  }
+
+  if (newlyBlocked.length > 0) {
+    chrome.storage.local.get(['blockedCount', 'blockedLog'], (result) => {
+      const newCount = (result.blockedCount || 0) + newlyBlocked.length;
+      let newLog = newlyBlocked.concat(result.blockedLog || []);
+      if (newLog.length > 50) newLog = newLog.slice(0, 50);
+      chrome.storage.local.set({ blockedCount: newCount, blockedLog: newLog });
+    });
   }
 }
 

@@ -13,9 +13,60 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   initCustomPrompt();
+  initBlockedLog();
 });
 
-const DEFAULT_PROMPT = "Analyze the following text. Is it toxic, distressing, clickbait, or manipulative engagement-bait?";
+function initBlockedLog() {
+  const countEl = document.getElementById('blockedCount');
+  const listEl = document.getElementById('blockedList');
+  const clearBtn = document.getElementById('clearLogBtn');
+
+  function renderLog(count, log) {
+    countEl.textContent = count || 0;
+    
+    if (!log || log.length === 0) {
+      listEl.innerHTML = '<em style="color: #999;">No content blocked yet.</em>';
+      return;
+    }
+
+    listEl.innerHTML = '';
+    log.forEach(item => {
+      const div = document.createElement('div');
+      div.style.marginBottom = '8px';
+      div.style.paddingBottom = '8px';
+      div.style.borderBottom = '1px solid #eee';
+      
+      const timeStr = new Date(item.timestamp).toLocaleTimeString();
+      const domainStr = item.domain ? ` <span style="color: #666; font-size: 10px;">(${item.domain})</span>` : '';
+      div.innerHTML = `<strong style="color: #e65100;">${timeStr}</strong>${domainStr} - ${item.text}`;
+      listEl.appendChild(div);
+    });
+  }
+
+  chrome.storage.local.get(['blockedCount', 'blockedLog'], (result) => {
+    renderLog(result.blockedCount, result.blockedLog);
+  });
+
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && (changes.blockedCount || changes.blockedLog)) {
+      chrome.storage.local.get(['blockedCount', 'blockedLog'], (result) => {
+        renderLog(result.blockedCount, result.blockedLog);
+      });
+    }
+  });
+
+  clearBtn.addEventListener('click', () => {
+    chrome.storage.local.set({ blockedCount: 0, blockedLog: [] });
+  });
+}
+
+const DEFAULT_PROMPT = `Analyze the following text. Act as an expert Trust and Safety Content Moderator. Analyze the following text and determine if it contains any harmful elements.
+
+Look specifically for:
+1. Toxicity: Insults, hate speech, harassment, profanity, or aggressive tone.
+2. Distressing Content: Violence, self-harm references, or extreme negativity/doomscrolling material.
+3. Clickbait: Sensationalized language, exaggerated claims, or intentionally withholding key information to force a click.
+4. Manipulative Engagement-Bait: Guilt-tripping, fear-mongering, forced sharing (e.g., 'share if you care'), or false urgency.`;
 
 function initCustomPrompt() {
   const promptInput = document.getElementById('promptInput');
