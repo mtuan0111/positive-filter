@@ -93,11 +93,13 @@ Look specifically for:
     overlay.style.left = '0';
     overlay.style.width = '100%';
     overlay.style.height = '100%';
-    overlay.style.backdropFilter = 'blur(5px)';
-    overlay.style.WebkitBackdropFilter = 'blur(5px)';
-    overlay.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+    overlay.style.backdropFilter = 'blur(8px)';
+    overlay.style.WebkitBackdropFilter = 'blur(8px)';
+    overlay.style.backgroundColor = 'rgba(230, 230, 230, 0.4)';
     overlay.style.zIndex = '999998';
     overlay.style.pointerEvents = 'none';
+    overlay.style.transition = 'all 0.3s ease';
+    overlay.style.animation = 'positivity-pulse 1.5s ease-in-out infinite';
 
     const spinner = document.createElement('div');
     const iconUrl = chrome.runtime.getURL("asset/posstive-filter-png.png");
@@ -113,15 +115,23 @@ Look specifically for:
     spinner.style.color = '#333';
     spinner.style.padding = '4px 8px';
     spinner.style.borderRadius = '4px';
-    spinner.style.fontSize = '12px';
+    spinner.style.fontSize = '14px';
+    spinner.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
     spinner.style.fontWeight = 'bold';
     spinner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
 
-    // Add keyframes for the spinner if not already added
-    if (!document.getElementById('positivity-spinner-style')) {
+    // Add keyframes for the spinner and skeleton if not already added
+    if (!document.getElementById('positivity-animation-style')) {
       const style = document.createElement('style');
-      style.id = 'positivity-spinner-style';
-      style.textContent = '@keyframes spin { 100% { transform: rotate(360deg); } }';
+      style.id = 'positivity-animation-style';
+      style.textContent = `
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes positivity-pulse {
+          0% { opacity: 0.6; }
+          50% { opacity: 1; }
+          100% { opacity: 0.6; }
+        }
+      `;
       document.head.appendChild(style);
     }
 
@@ -130,7 +140,26 @@ Look specifically for:
 
     const handleNegative = () => {
       target.dataset.positivityBlurred = "true";
-      target.remove();
+      
+      target.style.transition = 'all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)';
+      target.style.overflow = 'hidden';
+      target.style.height = target.offsetHeight + 'px';
+      
+      // Force reflow
+      target.offsetHeight;
+      
+      target.style.height = '0px';
+      target.style.paddingTop = '0px';
+      target.style.paddingBottom = '0px';
+      target.style.marginTop = '0px';
+      target.style.marginBottom = '0px';
+      target.style.opacity = '0';
+      target.style.border = 'none';
+
+      setTimeout(() => {
+        target.remove();
+      }, 400);
+
       newlyBlocked.push({
         text: text.length > 100 ? text.substring(0, 100) + "..." : text,
         timestamp: Date.now(),
@@ -138,12 +167,32 @@ Look specifically for:
       });
     };
 
-    const cleanupLoading = () => {
-      if (overlay.parentNode) overlay.remove();
-      if (!target.dataset.positivityBlurred) {
-        target.style.position = originalPosition;
+    const cleanupLoading = (isSafe = false) => {
+      if (isSafe && overlay.parentNode) {
+        // Remove blur and background immediately with transition
+        overlay.style.animation = 'none';
+        overlay.style.backdropFilter = 'none';
+        overlay.style.WebkitBackdropFilter = 'none';
+        overlay.style.backgroundColor = 'transparent';
+        
+        spinner.innerHTML = '<span style="font-size: 14px;">✅</span> Safe';
+        spinner.style.color = '#155724';
+        spinner.style.background = '#d4edda';
+        
+        setTimeout(() => {
+          if (overlay.parentNode) overlay.remove();
+          if (!target.dataset.positivityBlurred) {
+            target.style.position = originalPosition;
+          }
+          delete target.dataset.positivityChecking;
+        }, 2000);
+      } else {
+        if (overlay.parentNode) overlay.remove();
+        if (!target.dataset.positivityBlurred) {
+          target.style.position = originalPosition;
+        }
+        delete target.dataset.positivityChecking;
       }
-      delete target.dataset.positivityChecking;
     };
 
     let handledByNano = false;
@@ -184,7 +233,7 @@ Look specifically for:
           isNegativeResult = response.isNegative;
         }
       } catch (e) {
-        cleanupLoading();
+        cleanupLoading(false);
         break; // context invalidated
       }
     }
@@ -195,9 +244,10 @@ Look specifically for:
 
     if (isNegativeResult) {
       handleNegative();
+      cleanupLoading(false);
+    } else {
+      cleanupLoading(true);
     }
-
-    cleanupLoading();
   }
 
   if (nanoSession) {
