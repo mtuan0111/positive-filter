@@ -11,7 +11,36 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('flagPromptApiBtn').addEventListener('click', () => {
     chrome.tabs.create({ url: 'chrome://flags/#prompt-api-for-gemini-nano' });
   });
+
+  initCustomPrompt();
 });
+
+const DEFAULT_PROMPT = "Analyze the following text. Is it toxic, distressing, clickbait, or manipulative engagement-bait?";
+
+function initCustomPrompt() {
+  const promptInput = document.getElementById('promptInput');
+  const saveBtn = document.getElementById('savePromptBtn');
+  const resetBtn = document.getElementById('resetPromptBtn');
+  const statusEl = document.getElementById('promptStatus');
+
+  // Load existing
+  chrome.storage.local.get(['customPrompt'], (result) => {
+    promptInput.value = result.customPrompt || DEFAULT_PROMPT;
+  });
+
+  saveBtn.addEventListener('click', () => {
+    const val = promptInput.value.trim() || DEFAULT_PROMPT;
+    chrome.storage.local.set({ customPrompt: val }, () => {
+      statusEl.style.display = 'block';
+      setTimeout(() => statusEl.style.display = 'none', 2000);
+    });
+  });
+
+  resetBtn.addEventListener('click', () => {
+    promptInput.value = DEFAULT_PROMPT;
+    chrome.storage.local.set({ customPrompt: DEFAULT_PROMPT });
+  });
+}
 
 async function checkNanoStatus() {
   const promptIcon = document.getElementById('promptIcon');

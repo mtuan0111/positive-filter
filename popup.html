@@ -91,7 +91,8 @@
 
 <body>
   <div class="header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-    <img src="asset/posstive-filter-png.png" alt="Gemini Positivity Filter Logo" style="width: 32px; height: 32px; border-radius: 6px;">
+    <img src="asset/posstive-filter-png.png" alt="Gemini Positivity Filter Logo"
+      style="width: 32px; height: 32px; border-radius: 6px;">
     <h3 style="margin: 0;">Gemini Positivity Filter</h3>
   </div>
 
@@ -108,7 +109,8 @@
     <button id="flagOptimizationBtn"><span id="optIcon">❓</span> Optimization Guide (BypassPerfRequirement)</button>
     <button id="flagPromptApiBtn"><span id="promptIcon">❓</span> Prompt API (Enabled)</button>
     <p class="hint" style="margin-top:8px; padding: 6px; background: #fff3e0; border-radius: 4px; color: #e65100;">
-      <strong>Note:</strong> After enabling these flags, you must manually restart Chrome completely (close all windows and reopen) for them to take effect.
+      <strong>Note:</strong> After enabling these flags, you must manually restart Chrome completely (close all windows
+      and reopen) for them to take effect.
     </p>
     <p id="nanoStatus" class="hint" style="margin-top:8px; font-weight:bold;"></p>
   </div>
@@ -125,6 +127,21 @@
     <button id="addCurrentBtn">Add Current Tab</button>
     <p id="urlStatus" class="hint" style="color:red;"></p>
     <ul id="urlList"></ul>
+  </div>
+
+  <hr style="margin: 15px 0;">
+
+  <div class="section">
+    <h4>3. Custom AI Rules</h4>
+    <p class="hint">Define what makes text "negative" for you. The Gemini Nano AI will use these rules to filter
+      content.</p>
+    <textarea id="promptInput" rows="4"
+      style="width:100%; margin-top:10px; padding:10px; box-sizing:border-box; border-radius:8px; border:1px solid #ddd; font-family:inherit; resize:vertical;"></textarea>
+    <div style="display:flex; gap:5px;">
+      <button id="savePromptBtn" style="background-color:#1a73e8; color:white;">Save Prompt</button>
+      <button id="resetPromptBtn">Reset</button>
+    </div>
+    <p id="promptStatus" class="hint" style="color:green; display:none;">Saved!</p>
   </div>
 
   <script type="module" src="popup.js"></script>

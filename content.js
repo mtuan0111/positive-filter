@@ -22,17 +22,16 @@ async function scanPage() {
 
   if (elementsToCheck.length === 0) return;
 
+  const { customPrompt } = await chrome.storage.local.get(['customPrompt']);
+  const basePrompt = customPrompt || "Analyze the following text. Is it toxic, distressing, clickbait, or manipulative engagement-bait?";
+
   let nanoSession = null;
   try {
     if (window.LanguageModel) {
       const availability = await window.LanguageModel.availability();
       console.log("availability: ", availability);
       if (availability === 'available') {
-        nanoSession = await window.LanguageModel.create(
-          //   {
-          //   systemPrompt: 'Analyze the following text. Is it toxic, distressing, clickbait, or manipulative engagement-bait? Reply only with "true" if it is negative/useless, or "false" otherwise.'
-          // }
-        );
+        nanoSession = await window.LanguageModel.create();
       }
     }
   } catch (e) {
@@ -123,9 +122,7 @@ async function scanPage() {
       try {
         console.log("text to analyze: ", text);
         const response = await nanoSession.prompt(
-          "Analyze the following text. Is it toxic, distressing, clickbait, or manipulative engagement-bait? Reply only with \"true\" if it is negative/useless, or \"false\" otherwise."
-          + "\n"
-          + "```" + text + "```"
+          `You are a content filtering assistant. ${basePrompt}\n\nReply ONLY with "true" if the text violates the criteria, or "false" otherwise. Do not explain.\nText:\n\`\`\`${text}\`\`\``
         );
 
         if (response.toLowerCase().includes("true")) {
