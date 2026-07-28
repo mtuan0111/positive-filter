@@ -12,8 +12,24 @@
     "<all_urls>"
   ],
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "asset/posstive-filter-png.png",
+      "48": "asset/posstive-filter-png.png",
+      "128": "asset/posstive-filter-png.png"
+    }
   },
+  "icons": {
+    "16": "asset/posstive-filter-png.png",
+    "48": "asset/posstive-filter-png.png",
+    "128": "asset/posstive-filter-png.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["asset/posstive-filter-png.png"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "background": {
     "service_worker": "background.js",
     "type": "module"

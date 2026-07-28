@@ -57,17 +57,31 @@ async function scanPage() {
 
     // Apply loading state
     target.dataset.positivityChecking = "true";
-    const originalFilter = target.style.filter;
     const originalPosition = target.style.position;
     
-    target.style.filter = "blur(4px)";
     if (window.getComputedStyle(target).position === 'static') {
       target.style.position = 'relative';
     }
 
+    const overlay = document.createElement('div');
+    overlay.style.position = 'absolute';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backdropFilter = 'blur(5px)';
+    overlay.style.WebkitBackdropFilter = 'blur(5px)';
+    overlay.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+    overlay.style.zIndex = '999998';
+    overlay.style.pointerEvents = 'none';
+
     const spinner = document.createElement('div');
-    spinner.innerHTML = '<span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span> Checking...';
+    const iconUrl = chrome.runtime.getURL("asset/posstive-filter-png.png");
+    spinner.innerHTML = `<img src="${iconUrl}" style="width: 16px; height: 16px; border-radius: 3px;"> <span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span> Checking...`;
     spinner.style.position = 'absolute';
+    spinner.style.display = 'flex';
+    spinner.style.alignItems = 'center';
+    spinner.style.gap = '6px';
     spinner.style.top = '10px';
     spinner.style.left = '10px';
     spinner.style.zIndex = '999999';
@@ -78,7 +92,6 @@ async function scanPage() {
     spinner.style.fontSize = '12px';
     spinner.style.fontWeight = 'bold';
     spinner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
-    spinner.style.pointerEvents = 'none';
     
     // Add keyframes for the spinner if not already added
     if (!document.getElementById('positivity-spinner-style')) {
@@ -88,7 +101,8 @@ async function scanPage() {
       document.head.appendChild(style);
     }
     
-    target.appendChild(spinner);
+    overlay.appendChild(spinner);
+    target.appendChild(overlay);
 
     const handleNegative = () => {
       target.dataset.positivityBlurred = "true";
@@ -96,9 +110,8 @@ async function scanPage() {
     };
 
     const cleanupLoading = () => {
-      if (spinner.parentNode) spinner.remove();
+      if (overlay.parentNode) overlay.remove();
       if (!target.dataset.positivityBlurred) {
-        target.style.filter = originalFilter;
         target.style.position = originalPosition;
       }
       delete target.dataset.positivityChecking;
