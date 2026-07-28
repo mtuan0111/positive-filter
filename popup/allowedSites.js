@@ -46,8 +46,20 @@ export function initAllowedSites() {
     });
   }
 
+  const DEFAULT_SITES = [
+    "*://facebook.com/*",
+    "*://x.com/*",
+    "*://instagram.com/*",
+    "*://quora.com/*",
+    "*://tiktok.com/*"
+  ];
+
   chrome.storage.local.get(['allowedUrls'], (result) => {
-    renderUrls(result.allowedUrls || []);
+    if (result.allowedUrls === undefined) {
+      chrome.storage.local.set({ allowedUrls: DEFAULT_SITES }, () => renderUrls(DEFAULT_SITES));
+    } else {
+      renderUrls(result.allowedUrls);
+    }
   });
 
   function savePattern(pattern) {

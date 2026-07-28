@@ -1,7 +1,23 @@
 import { classifyText } from './lib/classifier.js';
 import { syncContentScripts } from './lib/contentScriptSync.js';
 
-chrome.runtime.onInstalled.addListener(syncContentScripts);
+const DEFAULT_SITES = [
+  "*://facebook.com/*",
+  "*://x.com/*",
+  "*://instagram.com/*",
+  "*://quora.com/*",
+  "*://tiktok.com/*"
+];
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.storage.local.get(['allowedUrls'], (result) => {
+    if (result.allowedUrls === undefined) {
+      chrome.storage.local.set({ allowedUrls: DEFAULT_SITES }, syncContentScripts);
+    } else {
+      syncContentScripts();
+    }
+  });
+});
 chrome.runtime.onStartup.addListener(syncContentScripts);
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "local" && changes.allowedUrls) syncContentScripts();

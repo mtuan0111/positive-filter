@@ -46,6 +46,13 @@ async function checkNanoStatus() {
   const promptIcon = document.getElementById('promptIcon');
   const optIcon = document.getElementById('optIcon');
   const statusEl = document.getElementById('nanoStatus');
+  const restartNote = document.getElementById('restartNote');
+  const disableTip = document.getElementById('disableTip');
+
+  const setNotReadyUi = () => {
+    restartNote.style.display = 'block';
+    disableTip.style.display = 'none';
+  };
 
   try {
     if (window.LanguageModel) {
@@ -63,21 +70,26 @@ async function checkNanoStatus() {
         optIcon.textContent = '✅';
         statusEl.textContent = 'Gemini Nano is ready to use!';
         statusEl.style.color = 'green';
+        restartNote.style.display = 'none';
+        disableTip.style.display = 'block';
       } else {
         optIcon.textContent = '⚠️';
         statusEl.textContent = 'Optimization Guide is not ready yet. Please ensure it is set to "Enabled BypassPerfRequirement". If you just enabled it, Chrome may still be downloading the model.';
         statusEl.style.color = 'orange';
+        setNotReadyUi();
       }
     } else {
       promptIcon.textContent = '⚠️';
       optIcon.textContent = '⚠️';
       statusEl.textContent = 'Prompt API is not detected. Please ensure it is set to "Enabled" and restart Chrome.';
       statusEl.style.color = 'red';
+      setNotReadyUi();
     }
   } catch (e) {
     optIcon.textContent = '⚠️';
     statusEl.textContent = `Error checking status: ${e.message}`;
     statusEl.style.color = 'red';
+    setNotReadyUi();
     console.error(e);
   }
 }
