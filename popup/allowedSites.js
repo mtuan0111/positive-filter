@@ -8,7 +8,7 @@ export function toMatchPattern(raw) {
     return value.includes('/', value.indexOf('://') + 3) ? value : `${value}/*`;
   }
 
-  return `*://${value.replace(/^\/+/, '')}/*`;
+  return `*://*.${value.replace(/^\/+/, '')}/*`;
 }
 
 export function initAllowedSites() {
@@ -109,7 +109,7 @@ export function initAllowedSites() {
       }
 
       const rootDomain = hostname.replace(/^www\./, '');
-      savePattern(`*://${rootDomain}/*`);
+      savePattern(`*://*.${rootDomain}/*`);
     });
   }
 
