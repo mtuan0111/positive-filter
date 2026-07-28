@@ -15,7 +15,19 @@ chrome.runtime.onInstalled.addListener(() => {
     if (result.allowedUrls === undefined) {
       chrome.storage.local.set({ allowedUrls: DEFAULT_SITES }, syncContentScripts);
     } else {
-      syncContentScripts();
+      // Migrate old patterns without subdomain wildcard
+      // e.g. *://facebook.com/* → *://*.facebook.com/*
+      const migrated = result.allowedUrls.map(url => {
+        const match = url.match(/^\*:\/\/([^*.][^/]+)\/\*$/);
+        if (match) return `*://*.${match[1]}/*`;
+        return url;
+      });
+      const changed = migrated.some((u, i) => u !== result.allowedUrls[i]);
+      if (changed) {
+        chrome.storage.local.set({ allowedUrls: migrated }, syncContentScripts);
+      } else {
+        syncContentScripts();
+      }
     }
   });
 });

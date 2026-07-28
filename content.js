@@ -12,19 +12,25 @@ async function hashText(text) {
 // A simple function to scan paragraphs. In a real app, you'd want to optimize this
 // so you don't hit API rate limits by scanning hundreds of elements at once.
 async function scanPage() {
-
-
   // Once the extension is reloaded/updated (common during development), this page's
   // content script is orphaned -- chrome.runtime is torn down and calling into it
   // throws "Extension context invalidated". Bail out rather than crash on every scan.
   if (!chrome.runtime?.id) return;
 
-  const paragraphs = document.querySelectorAll('p, h1, h2, h3, span, a');
+  const paragraphs = document.querySelectorAll(
+    // Standard semantic tags
+    'p, h1, h2, h3, span, a, ' +
+    // Facebook
+    '[role="article"], [data-ad-comet-rendering-mode], div[dir="auto"], ' +
+    // Quora feed items and text blocks
+    '[class*="dom_annotate_multifeed_bundle"], .puppeteer_test_tribe_post_item_feed_story, ' +
+    '.qu-wordBreak--break-word'
+  );
 
   // Only look at elements we haven't already processed, and cap the batch size
   // to save API calls when a lot of new content loads at once.
   const elementsToCheck = Array.from(paragraphs)
-    .filter(el => !processedElements.has(el))
+    .filter(el => !processedElements.has(el) && el.innerText && el.innerText.trim().length >= 20)
     .slice(0, 50);
 
   if (elementsToCheck.length === 0) return;
@@ -61,7 +67,11 @@ Look specifically for:
     if (text.length < 20) continue; // Skip very short text
 
     // Find a suitable container to blur (like a feed item, article, or post)
-    let target = el.closest('[role="article"], article,  .post, .tweet, .card, .feed-item, li');
+    let target = el.closest(
+      '[role="article"], article, .post, .tweet, .card, .feed-item, li, ' +
+      // Quora bundles
+      '[class*="dom_annotate_multifeed_bundle"]'
+    );
     if (!target) {
       // Fallback: get the closest major container, or just the parent
       target = el.closest('div, section') || el.parentElement || el;
@@ -121,8 +131,8 @@ Look specifically for:
     const handleNegative = () => {
       target.dataset.positivityBlurred = "true";
       target.remove();
-      newlyBlocked.push({ 
-        text: text.length > 100 ? text.substring(0, 100) + "..." : text, 
+      newlyBlocked.push({
+        text: text.length > 100 ? text.substring(0, 100) + "..." : text,
         timestamp: Date.now(),
         domain: window.location.hostname
       });
