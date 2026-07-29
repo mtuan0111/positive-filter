@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A Chrome Extension (Manifest V3) called "Gemini Positivity Filter". It scans text on any web page and, preferring Chrome's on-device `LanguageModel` (Gemini Nano) when available and falling back to the Gemini cloud API otherwise, detects negative/toxic/low-value content and removes matching elements from the page. The popup UI is now Gemini Nano-first: it has no field to enter a Gemini API key (that section was removed), only buttons that open `chrome://flags` to enable on-device Gemini Nano plus a live status readout. The cloud-API fallback path in `lib/classifier.js` still exists in code but has no UI to populate `chrome.storage.local.geminiApiKey`, so in practice it only works if that key was set some other way (e.g. manually via the service worker console).
+A Chrome Extension (Manifest V3) called "Gemini Positivity Filter". It scans text on any web page using Chrome's on-device LanguageModel (Gemini Nano) to locally detect and remove negative, toxic, or low-value content. The extension is strictly privacy-first and on-device: it has no cloud API fallbacks, no external network requests for classification, and no API key requirements.
 
 There is no build system, package manager, bundler, linter, or test suite — the extension runs directly from raw source files. `background.js` and `popup.js` are loaded as native ES modules (`"type": "module"` in the manifest / `<script type="module">`), so code is split into `lib/`/`popup/` files via plain `import`/`export` with no bundler involved. Do not introduce a build step (npm, webpack, TypeScript, etc.) unless the user explicitly asks for one.
 
