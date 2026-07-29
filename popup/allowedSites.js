@@ -25,7 +25,8 @@ export function initAllowedSites() {
 
   function renderUrls(urls) {
     urlList.textContent = '';
-    urls.forEach((pattern) => {
+    const reversedUrls = [...urls].reverse();
+    reversedUrls.forEach((pattern) => {
       const li = document.createElement('li');
 
       const label = document.createElement('span');

@@ -103,7 +103,7 @@ Look specifically for:
 
     const spinner = document.createElement('div');
     const iconUrl = chrome.runtime.getURL("asset/posstive-filter-png.png");
-    spinner.innerHTML = `<img src="${iconUrl}" style="width: 16px; height: 16px; border-radius: 3px;"> <span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span> Checking...`;
+    spinner.innerHTML = `<img src="${iconUrl}" style="width: 16px; height: 16px; border-radius: 3px;"> Clarifying... <span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span>`;
     spinner.style.position = 'absolute';
     spinner.style.display = 'flex';
     spinner.style.alignItems = 'center';
@@ -196,7 +196,7 @@ Look specifically for:
         overlay.style.WebkitBackdropFilter = 'none';
         overlay.style.backgroundColor = 'transparent';
         
-        spinner.innerHTML = '<span style="font-size: 14px;">✅</span> Safe';
+        spinner.innerHTML = '<span style="font-size: 14px;">✅</span>';
         spinner.style.color = 'var(--pf-success-dark, #155724)';
         spinner.style.background = 'var(--pf-success-bg, #d4edda)';
         
