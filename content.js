@@ -49,8 +49,7 @@ Look specifically for:
   let nanoSession = null;
   try {
     if (window.LanguageModel) {
-      const availability = await window.LanguageModel.availability();
-      console.log("availability: ", availability);
+      const availability = await window.LanguageModel.availability()
       if (availability === 'available') {
         nanoSession = await window.LanguageModel.create();
       }
@@ -59,72 +58,71 @@ Look specifically for:
     console.warn("Nano AI initialization failed:", e);
   }
 
-  for (let el of elementsToCheck) {
-    console.log("check", el);
+  for (let el of elementsToCheck)
     processedElements.add(el);
 
-    const text = el.innerText.trim();
-    if (text.length < 20) continue; // Skip very short text
+  const text = el.innerText.trim();
+  if (text.length < 20) continue; // Skip very short text
 
-    // Find a suitable container to blur (like a feed item, article, or post)
-    let target = el.closest(
-      '[role="article"], article, .post, .tweet, .card, .feed-item, li, ' +
-      // Quora bundles
-      '[class*="dom_annotate_multifeed_bundle"]'
-    );
-    if (!target) {
-      // Fallback: get the closest major container, or just the parent
-      target = el.closest('div, section') || el.parentElement || el;
-    }
+  // Find a suitable container to blur (like a feed item, article, or post)
+  let target = el.closest(
+    '[role="article"], article, .post, .tweet, .card, .feed-item, li, ' +
+    // Quora bundles
+    '[class*="dom_annotate_multifeed_bundle"]'
+  );
+  if (!target) {
+    // Fallback: get the closest major container, or just the parent
+    target = el.closest('div, section') || el.parentElement || el;
+  }
 
-    if (target.dataset.positivityBlurred || target.dataset.positivityChecking) continue;
+  if (target.dataset.positivityBlurred || target.dataset.positivityChecking) continue;
 
-    // Apply loading state
-    target.dataset.positivityChecking = "true";
-    const originalPosition = target.style.position;
+  // Apply loading state
+  target.dataset.positivityChecking = "true";
+  const originalPosition = target.style.position;
 
-    if (window.getComputedStyle(target).position === 'static') {
-      target.style.position = 'relative';
-    }
+  if (window.getComputedStyle(target).position === 'static') {
+    target.style.position = 'relative';
+  }
 
-    const overlay = document.createElement('div');
-    overlay.style.position = 'absolute';
-    overlay.style.top = '0';
-    overlay.style.left = '0';
-    overlay.style.width = '100%';
-    overlay.style.height = '100%';
-    overlay.style.backdropFilter = 'blur(8px)';
-    overlay.style.WebkitBackdropFilter = 'blur(8px)';
-    overlay.style.backgroundColor = 'var(--pf-overlay-bg, rgba(230, 230, 230, 0.4))';
-    overlay.style.zIndex = '999998';
-    overlay.style.pointerEvents = 'none';
-    overlay.style.transition = 'all 0.3s ease';
-    overlay.style.animation = 'positivity-pulse 1.5s ease-in-out infinite';
+  const overlay = document.createElement('div');
+  overlay.style.position = 'absolute';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.backdropFilter = 'blur(8px)';
+  overlay.style.WebkitBackdropFilter = 'blur(8px)';
+  overlay.style.backgroundColor = 'var(--pf-overlay-bg, rgba(230, 230, 230, 0.4))';
+  overlay.style.zIndex = '999998';
+  overlay.style.pointerEvents = 'none';
+  overlay.style.transition = 'all 0.3s ease';
+  overlay.style.animation = 'positivity-pulse 1.5s ease-in-out infinite';
 
-    const spinner = document.createElement('div');
-    const iconUrl = chrome.runtime.getURL("asset/posstive-filter-png.png");
-    spinner.innerHTML = `<img src="${iconUrl}" style="width: 16px; height: 16px; border-radius: 3px;"> Clarifying... <span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span>`;
-    spinner.style.position = 'absolute';
-    spinner.style.display = 'flex';
-    spinner.style.alignItems = 'center';
-    spinner.style.gap = '6px';
-    spinner.style.top = '10px';
-    spinner.style.left = '10px';
-    spinner.style.zIndex = '999999';
-    spinner.style.background = 'var(--pf-spinner-bg, rgba(255, 255, 255, 0.9))';
-    spinner.style.color = 'var(--pf-text, #333)';
-    spinner.style.padding = '4px 8px';
-    spinner.style.borderRadius = '4px';
-    spinner.style.fontSize = '14px';
-    spinner.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
-    spinner.style.fontWeight = 'bold';
-    spinner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+  const spinner = document.createElement('div');
+  const iconUrl = chrome.runtime.getURL("asset/posstive-filter-png.png");
+  spinner.innerHTML = `<img src="${iconUrl}" style="width: 16px; height: 16px; border-radius: 3px;"> Clarifying... <span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span>`;
+  spinner.style.position = 'absolute';
+  spinner.style.display = 'flex';
+  spinner.style.alignItems = 'center';
+  spinner.style.gap = '6px';
+  spinner.style.top = '10px';
+  spinner.style.left = '10px';
+  spinner.style.zIndex = '999999';
+  spinner.style.background = 'var(--pf-spinner-bg, rgba(255, 255, 255, 0.9))';
+  spinner.style.color = 'var(--pf-text, #333)';
+  spinner.style.padding = '4px 8px';
+  spinner.style.borderRadius = '4px';
+  spinner.style.fontSize = '14px';
+  spinner.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+  spinner.style.fontWeight = 'bold';
+  spinner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
 
-    // Add keyframes for the spinner and skeleton if not already added
-    if (!document.getElementById('positivity-animation-style')) {
-      const style = document.createElement('style');
-      style.id = 'positivity-animation-style';
-      style.textContent = `
+  // Add keyframes for the spinner and skeleton if not already added
+  if (!document.getElementById('positivity-animation-style')) {
+    const style = document.createElement('style');
+    style.id = 'positivity-animation-style';
+    style.textContent = `
         :root {
           --pf-primary: #1a73e8;
           --pf-primary-hover: #1557b0;
@@ -153,136 +151,135 @@ Look specifically for:
           100% { opacity: 0.6; }
         }
       `;
-      document.head.appendChild(style);
-    }
+    document.head.appendChild(style);
+  }
 
-    overlay.appendChild(spinner);
-    target.appendChild(overlay);
+  overlay.appendChild(spinner);
+  target.appendChild(overlay);
 
-    const handleNegative = () => {
-      target.dataset.positivityBlurred = "true";
-      
-      target.style.transition = 'all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)';
-      target.style.overflow = 'hidden';
-      target.style.height = target.offsetHeight + 'px';
-      
-      // Force reflow
-      target.offsetHeight;
-      
-      target.style.height = '0px';
-      target.style.paddingTop = '0px';
-      target.style.paddingBottom = '0px';
-      target.style.marginTop = '0px';
-      target.style.marginBottom = '0px';
-      target.style.opacity = '0';
-      target.style.border = 'none';
+  const handleNegative = () => {
+    target.dataset.positivityBlurred = "true";
+
+    target.style.transition = 'all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)';
+    target.style.overflow = 'hidden';
+    target.style.height = target.offsetHeight + 'px';
+
+    // Force reflow
+    target.offsetHeight;
+
+    target.style.height = '0px';
+    target.style.paddingTop = '0px';
+    target.style.paddingBottom = '0px';
+    target.style.marginTop = '0px';
+    target.style.marginBottom = '0px';
+    target.style.opacity = '0';
+    target.style.border = 'none';
+
+    setTimeout(() => {
+      target.remove();
+    }, 400);
+
+    newlyBlocked.push({
+      text: text.length > 100 ? text.substring(0, 100) + "..." : text,
+      timestamp: Date.now(),
+      domain: window.location.hostname
+    });
+  };
+
+  const cleanupLoading = (isSafe = false) => {
+    if (isSafe && overlay.parentNode) {
+      // Remove blur and background immediately with transition
+      overlay.style.animation = 'none';
+      overlay.style.backdropFilter = 'none';
+      overlay.style.WebkitBackdropFilter = 'none';
+      overlay.style.backgroundColor = 'transparent';
+
+      spinner.innerHTML = '<span style="font-size: 14px;">✅</span>';
+      spinner.style.color = 'var(--pf-success-dark, #155724)';
+      spinner.style.background = 'var(--pf-success-bg, #d4edda)';
 
       setTimeout(() => {
-        target.remove();
-      }, 400);
-
-      newlyBlocked.push({
-        text: text.length > 100 ? text.substring(0, 100) + "..." : text,
-        timestamp: Date.now(),
-        domain: window.location.hostname
-      });
-    };
-
-    const cleanupLoading = (isSafe = false) => {
-      if (isSafe && overlay.parentNode) {
-        // Remove blur and background immediately with transition
-        overlay.style.animation = 'none';
-        overlay.style.backdropFilter = 'none';
-        overlay.style.WebkitBackdropFilter = 'none';
-        overlay.style.backgroundColor = 'transparent';
-        
-        spinner.innerHTML = '<span style="font-size: 14px;">✅</span>';
-        spinner.style.color = 'var(--pf-success-dark, #155724)';
-        spinner.style.background = 'var(--pf-success-bg, #d4edda)';
-        
-        setTimeout(() => {
-          if (overlay.parentNode) overlay.remove();
-          if (!target.dataset.positivityBlurred) {
-            target.style.position = originalPosition;
-          }
-          delete target.dataset.positivityChecking;
-        }, 2000);
-      } else {
         if (overlay.parentNode) overlay.remove();
         if (!target.dataset.positivityBlurred) {
           target.style.position = originalPosition;
         }
         delete target.dataset.positivityChecking;
-      }
-    };
-
-    let handledByNano = false;
-    let isNegativeResult = false;
-    let wasCached = false;
-
-    const cacheKey = CACHE_KEY_PREFIX + await hashText(text);
-    const cached = await chrome.storage.local.get([cacheKey]);
-
-    if (cached[cacheKey] !== undefined) {
-      isNegativeResult = cached[cacheKey];
-      wasCached = true;
-      handledByNano = true;
-    } else if (nanoSession) {
-      try {
-        console.log("text to analyze: ", text);
-        const response = await nanoSession.prompt(
-          `You are a content filtering assistant. ${basePrompt}\n\nReply ONLY with "true" if the text violates the criteria, or "false" otherwise. Do not explain.\nText:\n\`\`\`${text}\`\`\``
-        );
-
-        isNegativeResult = response.toLowerCase().includes("true");
-        handledByNano = true;
-      } catch (error) {
-        console.error("Error executing Nano prompt:", error);
-      }
-    }
-
-    if (!handledByNano) {
-      try {
-        const response = await new Promise((resolve, reject) => {
-          chrome.runtime.sendMessage({ action: "checkText", text: text }, (res) => {
-            if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
-            else resolve(res);
-          });
-        });
-
-        if (response && response.isNegative !== undefined) {
-          isNegativeResult = response.isNegative;
-        }
-      } catch (e) {
-        cleanupLoading(false);
-        break; // context invalidated
-      }
-    }
-
-    if (!wasCached && (handledByNano || isNegativeResult !== false)) {
-      chrome.storage.local.set({ [cacheKey]: isNegativeResult });
-    }
-
-    if (isNegativeResult) {
-      handleNegative();
-      cleanupLoading(false);
+      }, 2000);
     } else {
-      cleanupLoading(true);
+      if (overlay.parentNode) overlay.remove();
+      if (!target.dataset.positivityBlurred) {
+        target.style.position = originalPosition;
+      }
+      delete target.dataset.positivityChecking;
     }
-  }
+  };
 
-  if (nanoSession) {
-    nanoSession.destroy();
-  }
+  let handledByNano = false;
+  let isNegativeResult = false;
+  let wasCached = false;
 
-  if (newlyBlocked.length > 0) {
-    chrome.storage.local.get(['blockedCount', 'blockedLog'], (result) => {
-      const newCount = (result.blockedCount || 0) + newlyBlocked.length;
-      let newLog = newlyBlocked.concat(result.blockedLog || []);
-      if (newLog.length > 50) newLog = newLog.slice(0, 50);
-      chrome.storage.local.set({ blockedCount: newCount, blockedLog: newLog });
+  const cacheKey = CACHE_KEY_PREFIX + await hashText(text);
+  const cached = await chrome.storage.local.get([cacheKey]);
+
+  if (cached[cacheKey] !== undefined) {
+    isNegativeResult = cached[cacheKey];
+    wasCached = true;
+    handledByNano = true;
+  } else if (nanoSession) {
+    try 
+        const response = await nanoSession.prompt(
+      `You are a content filtering assistant. ${basePrompt}\n\nReply ONLY with "true" if the text violates the criteria, or "false" otherwise. Do not explain.\nText:\n\`\`\`${text}\`\`\``
+    );
+
+    isNegativeResult = response.toLowerCase().includes("true");
+    handledByNano = true;
+  } catch (error) {
+    console.error("Error executing Nano prompt:", error);
+  }
+}
+
+if (!handledByNano) {
+  try {
+    const response = await new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ action: "checkText", text: text }, (res) => {
+        if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
+        else resolve(res);
+      });
     });
+
+    if (response && response.isNegative !== undefined) {
+      isNegativeResult = response.isNegative;
+    }
+  } catch (e) {
+    cleanupLoading(false);
+    break; // context invalidated
   }
+}
+
+if (!wasCached && (handledByNano || isNegativeResult !== false)) {
+  chrome.storage.local.set({ [cacheKey]: isNegativeResult });
+}
+
+if (isNegativeResult) {
+  handleNegative();
+  cleanupLoading(false);
+} else {
+  cleanupLoading(true);
+}
+  }
+
+if (nanoSession) {
+  nanoSession.destroy();
+}
+
+if (newlyBlocked.length > 0) {
+  chrome.storage.local.get(['blockedCount', 'blockedLog'], (result) => {
+    const newCount = (result.blockedCount || 0) + newlyBlocked.length;
+    let newLog = newlyBlocked.concat(result.blockedLog || []);
+    if (newLog.length > 50) newLog = newLog.slice(0, 50);
+    chrome.storage.local.set({ blockedCount: newCount, blockedLog: newLog });
+  });
+}
 }
 
 // Avoid firing scanPage on every single scroll/mutation event; wait until things
