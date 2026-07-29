@@ -10,7 +10,7 @@ A privacy-first Chrome Extension that uses Chrome's built-in on-device AI (Gemin
 - **Dynamic Content Filtering**: Automatically scans and removes toxic content, clickbait, and engagement-bait as you scroll.
 - **Custom AI Rules**: Define exactly what "negative" means to you using your own custom prompt rules.
 - **Targeted Activation**: Only runs on the specific websites you choose, preserving performance on other sites — a handful of common social sites (Facebook, X/Twitter, Instagram, Quora, TikTok) are pre-added by default on install, and you can add/remove sites freely.
-- **Visual Feedback**: Shows a pulsing blur overlay while content is being analyzed, a quick "✅ Safe" badge when something checks out clean, and a smooth collapse animation when negative content is removed.
+- **Visual Feedback**: Shows a pulsing blur overlay while content is being analyzed, a quick "✅" badge when something checks out clean, and a smooth collapse animation when negative content is removed.
 - **Blocked Content Log**: Keeps a running count and recent history of what's been filtered out, viewable (and clearable) right in the popup.
 
 ## Installation
