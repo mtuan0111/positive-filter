@@ -211,11 +211,15 @@
     <h4>3. Custom AI Rules</h4>
     <p class="hint">Define what makes text "negative" for you. The Gemini Nano AI will use these rules to filter
       content.</p>
-    <textarea id="promptInput" rows="4"
+    <p class="hint" style="color: var(--pf-warning); background: var(--pf-warning-bg); padding: 4px 6px; border-radius: 4px; border: 1px solid rgba(230, 81, 0, 0.2); margin-top: 6px;">
+      <strong>Note:</strong> Your rule MUST define negative or harmful content. The AI will verify your rule before saving to ensure it doesn't accidentally block safe content.
+    </p>
+    <textarea id="promptInput" rows="9"
       style="width:100%; margin-top:10px; padding:10px; box-sizing:border-box; border-radius:8px; border:1px solid var(--pf-border); font-family:inherit; resize:vertical;"></textarea>
     <div style="display:flex; gap:5px;">
       <button id="savePromptBtn">Save Prompt</button>
       <button id="resetPromptBtn">Reset</button>
+      <button id="sharePromptBtn" style="background-color: var(--pf-primary-light); color: var(--pf-primary); border: 1px solid var(--pf-primary);">Share</button>
     </div>
     <p id="promptStatus" class="hint" style="color:var(--pf-success); display:none;">Saved!</p>
   </div>

@@ -163,6 +163,18 @@ Prompt to evaluate:
     promptInput.value = DEFAULT_PROMPT;
     chrome.storage.local.set({ customPrompt: DEFAULT_PROMPT }, clearCache);
   });
+
+  const shareBtn = document.getElementById('sharePromptBtn');
+  shareBtn.addEventListener('click', () => {
+    const val = promptInput.value.trim() || DEFAULT_PROMPT;
+    navigator.clipboard.writeText(val).then(() => {
+      const originalText = shareBtn.textContent;
+      shareBtn.textContent = 'Copied to Clipboard!';
+      setTimeout(() => shareBtn.textContent = originalText, 2000);
+    }).catch(err => {
+      console.error('Could not copy text: ', err);
+    });
+  });
 }
 
 async function checkNanoStatus() {
