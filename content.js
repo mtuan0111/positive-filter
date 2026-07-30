@@ -17,6 +17,9 @@ async function scanPage() {
   // throws "Extension context invalidated". Bail out rather than crash on every scan.
   if (!chrome.runtime?.id) return;
 
+  const { filterEnabled } = await chrome.storage.local.get(['filterEnabled']);
+  if (filterEnabled === false) return;
+
   const paragraphs = document.querySelectorAll(
     // Standard semantic tags
     'p, h1, h2, h3, span, a, ' +

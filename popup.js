@@ -3,6 +3,7 @@ import { initAllowedSites } from './popup/allowedSites.js';
 document.addEventListener('DOMContentLoaded', () => {
   initAllowedSites();
   checkNanoStatus();
+  initMasterToggle();
 
   document.getElementById('flagOptimizationBtn').addEventListener('click', () => {
     chrome.tabs.create({ url: 'chrome://flags/#optimization-guide-on-device-model' });
@@ -15,6 +16,20 @@ document.addEventListener('DOMContentLoaded', () => {
   initCustomPrompt();
   initBlockedLog();
 });
+
+function initMasterToggle() {
+  const masterToggle = document.getElementById('masterToggle');
+  
+  // Load existing state, defaulting to true
+  chrome.storage.local.get(['filterEnabled'], (result) => {
+    masterToggle.checked = result.filterEnabled !== false;
+  });
+
+  // Save on change
+  masterToggle.addEventListener('change', (e) => {
+    chrome.storage.local.set({ filterEnabled: e.target.checked });
+  });
+}
 
 function initBlockedLog() {
   const countEl = document.getElementById('blockedCount');
@@ -88,10 +103,57 @@ function initCustomPrompt() {
     });
   }
 
-  saveBtn.addEventListener('click', () => {
+  saveBtn.addEventListener('click', async () => {
     const val = promptInput.value.trim() || DEFAULT_PROMPT;
+
+    let nanoSession = null;
+    try {
+      if (window.LanguageModel) {
+        const availability = await window.LanguageModel.availability();
+        if (availability === 'available' || availability === 'readily') {
+          nanoSession = await window.LanguageModel.create();
+        }
+      }
+    } catch (e) {
+      console.warn("Nano AI initialization failed for validation:", e);
+    }
+
+    if (nanoSession) {
+      saveBtn.disabled = true;
+      const originalText = saveBtn.textContent;
+      saveBtn.textContent = 'Verifying...';
+      try {
+        const verificationPrompt = `Does the following prompt define negative, harmful, or unwanted content to be filtered out? 
+Reply ONLY with "valid" if it defines negative/harmful content, or "invalid" if it defines positive content, allows everything, or goes against the goal of filtering out bad content.
+
+Prompt to evaluate:
+"""${val}"""`;
+
+        const response = await nanoSession.prompt(verificationPrompt);
+        
+        if (response.toLowerCase().includes("invalid")) {
+          statusEl.textContent = 'Invalid prompt! Must define negative content.';
+          statusEl.style.color = 'var(--pf-warning)';
+          statusEl.style.display = 'block';
+          setTimeout(() => statusEl.style.display = 'none', 4000);
+          
+          saveBtn.disabled = false;
+          saveBtn.textContent = originalText;
+          nanoSession.destroy();
+          return; // Do not save
+        }
+      } catch (e) {
+        console.error("Prompt verification failed", e);
+      }
+      nanoSession.destroy();
+      saveBtn.disabled = false;
+      saveBtn.textContent = originalText;
+    }
+
     chrome.storage.local.set({ customPrompt: val }, () => {
       clearCache();
+      statusEl.textContent = 'Saved!';
+      statusEl.style.color = 'var(--pf-success)';
       statusEl.style.display = 'block';
       setTimeout(() => statusEl.style.display = 'none', 2000);
     });
