@@ -56,23 +56,27 @@
       transform: translateY(-1px);
     }
 
-    input:focus, textarea:focus {
+    input:focus,
+    textarea:focus {
       border-color: var(--pf-primary);
       outline: none;
       box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
     }
 
     /* Primary button style */
-    #addCurrentBtn, #savePromptBtn {
+    #addCurrentBtn,
+    #savePromptBtn {
       background-color: var(--pf-primary);
       color: white;
     }
 
-    #addCurrentBtn:hover, #savePromptBtn:hover {
+    #addCurrentBtn:hover,
+    #savePromptBtn:hover {
       background-color: var(--pf-primary-hover);
     }
 
-    h3, h4 {
+    h3,
+    h4 {
       margin-bottom: 5px;
       color: var(--pf-text);
     }
@@ -109,6 +113,7 @@
       padding: 2px 8px;
       flex-shrink: 0;
     }
+
     /* Switch toggle */
     .switch {
       position: relative;
@@ -116,11 +121,13 @@
       width: 40px;
       height: 20px;
     }
+
     .switch input {
       opacity: 0;
       width: 0;
       height: 0;
     }
+
     .slider {
       position: absolute;
       cursor: pointer;
@@ -132,6 +139,7 @@
       transition: .4s;
       border-radius: 20px;
     }
+
     .slider:before {
       position: absolute;
       content: "";
@@ -143,10 +151,12 @@
       transition: .4s;
       border-radius: 50%;
     }
-    .switch input:checked + .slider {
+
+    .switch input:checked+.slider {
       background-color: var(--pf-primary);
     }
-    .switch input:checked + .slider:before {
+
+    .switch input:checked+.slider:before {
       transform: translateX(20px);
     }
   </style>
@@ -155,9 +165,9 @@
 <body>
   <div class="header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
     <div style="display: flex; align-items: center; gap: 10px;">
-      <img src="asset/posstive-filter-png.png" alt="Gemini Positivity Filter Logo"
+      <img src="asset/posstive-filter-png.png" alt="Positivity Circle Logo"
         style="width: 32px; height: 32px; border-radius: 6px;">
-      <h3 style="margin: 0;">Gemini Positivity Filter</h3>
+      <h3 style="margin: 0;">Positivity Circle</h3>
     </div>
     <label class="switch" title="Toggle filter on/off">
       <input type="checkbox" id="masterToggle">
@@ -165,13 +175,13 @@
     </label>
   </div>
 
-  <div
-  <div
+  <div <div
     style="background-color: var(--pf-primary-light); padding: 10px; border-radius: 6px; font-size: 11px; color: var(--pf-primary); margin-bottom: 15px; line-height: 1.4;">
     <strong>100% Private & Offline:</strong> This extension uses Chrome's built-in AI (Gemini Nano). It runs
     entirely on your local PC, so your reading data never leaves your device.
     <br><br>
-    <strong>Note:</strong> Currently, this filter only analyzes <strong>text</strong>. It does not support scanning pictures or videos yet, but we hope to add that capability soon!
+    <strong>Note:</strong> Currently, this filter only analyzes <strong>text</strong>. It does not support scanning
+    pictures or videos yet, but we hope to add that capability soon!
   </div>
 
   <div class="section">
@@ -179,12 +189,14 @@
     <p class="hint">Click to open Chrome flags. Set to exact values:</p>
     <button id="flagOptimizationBtn"><span id="optIcon">❓</span> Optimization Guide (BypassPerfRequirement)</button>
     <button id="flagPromptApiBtn"><span id="promptIcon">❓</span> Prompt API (Enabled)</button>
-    <p id="restartNote" class="hint" style="margin-top:8px; padding: 6px; background: var(--pf-warning-bg); border-radius: 4px; color: var(--pf-warning);">
+    <p id="restartNote" class="hint"
+      style="margin-top:8px; padding: 6px; background: var(--pf-warning-bg); border-radius: 4px; color: var(--pf-warning);">
       <strong>Note:</strong> After enabling these flags, you must manually restart Chrome completely (close all windows
       and reopen) for them to take effect.
     </p>
 
-    <p id="disableTip" class="hint" style="margin-top:8px; padding: 6px; background: var(--pf-primary-light); border-radius: 4px; color: var(--pf-primary); display:none;">
+    <p id="disableTip" class="hint"
+      style="margin-top:8px; padding: 6px; background: var(--pf-primary-light); border-radius: 4px; color: var(--pf-primary); display:none;">
       <strong>Tip:</strong> If you ever disable or uninstall this extension, it is recommended to disable the flags
       above to restore optimal browser performance.
     </p>
@@ -211,15 +223,18 @@
     <h4>3. Custom AI Rules</h4>
     <p class="hint">Define what makes text "negative" for you. The Gemini Nano AI will use these rules to filter
       content.</p>
-    <p class="hint" style="color: var(--pf-warning); background: var(--pf-warning-bg); padding: 4px 6px; border-radius: 4px; border: 1px solid rgba(230, 81, 0, 0.2); margin-top: 6px;">
-      <strong>Note:</strong> Your rule MUST define negative or harmful content. The AI will verify your rule before saving to ensure it doesn't accidentally block safe content.
+    <p class="hint"
+      style="color: var(--pf-warning); background: var(--pf-warning-bg); padding: 4px 6px; border-radius: 4px; border: 1px solid rgba(230, 81, 0, 0.2); margin-top: 6px;">
+      <strong>Note:</strong> Your rule MUST define negative or harmful content. The AI will verify your rule before
+      saving to ensure it doesn't accidentally block safe content.
     </p>
     <textarea id="promptInput" rows="9"
       style="width:100%; margin-top:10px; padding:10px; box-sizing:border-box; border-radius:8px; border:1px solid var(--pf-border); font-family:inherit; resize:vertical;"></textarea>
     <div style="display:flex; gap:5px;">
       <button id="savePromptBtn">Save Prompt</button>
       <button id="resetPromptBtn">Reset</button>
-      <button id="sharePromptBtn" style="background-color: var(--pf-primary-light); color: var(--pf-primary); border: 1px solid var(--pf-primary);">Share</button>
+      <button id="sharePromptBtn"
+        style="background-color: var(--pf-primary-light); color: var(--pf-primary); border: 1px solid var(--pf-primary);">Share</button>
     </div>
     <p id="promptStatus" class="hint" style="color:var(--pf-success); display:none;">Saved!</p>
   </div>
@@ -229,10 +244,12 @@
   <div class="section">
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <h4>4. Blocked Content</h4>
-      <span id="blockedCount" style="background: var(--pf-warning); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">0</span>
+      <span id="blockedCount"
+        style="background: var(--pf-warning); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">0</span>
     </div>
     <p class="hint">Recently filtered negative content:</p>
-    <div id="blockedList" style="max-height: 150px; overflow-y: auto; background: var(--pf-bg-secondary); border: 1px solid var(--pf-border); border-radius: 6px; padding: 8px; margin-top: 10px; font-size: 11px; color: var(--pf-text-secondary);">
+    <div id="blockedList"
+      style="max-height: 150px; overflow-y: auto; background: var(--pf-bg-secondary); border: 1px solid var(--pf-border); border-radius: 6px; padding: 8px; margin-top: 10px; font-size: 11px; color: var(--pf-text-secondary);">
       <em style="color: var(--pf-text-muted);">No content blocked yet.</em>
     </div>
     <button id="clearLogBtn" style="margin-top: 10px; width: 100%;">Clear Log</button>

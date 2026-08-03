@@ -1,8 +1,8 @@
-# Gemini Positivity Filter
+# Positivity Circle
 
 A privacy-first Chrome Extension that uses Chrome's built-in on-device AI (Gemini Nano) to scan text on web pages and filter out negative, toxic, or low-value content in real time. Because it runs 100% locally on your machine, your reading data never leaves your device.
 
-![Gemini Positivity Filter Logo](asset/posstive-filter-png.png)
+![Positivity Circle Logo](asset/posstive-filter-png.png)
 
 ## Features
 
