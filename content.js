@@ -94,13 +94,13 @@ Look specifically for:
     overlay.style.left = '0';
     overlay.style.width = '100%';
     overlay.style.height = '100%';
-    overlay.style.backdropFilter = 'blur(8px)';
-    overlay.style.WebkitBackdropFilter = 'blur(8px)';
-    overlay.style.backgroundColor = 'var(--pf-overlay-bg, rgba(230, 230, 230, 0.4))';
-    overlay.style.zIndex = '999998';
-    overlay.style.pointerEvents = 'none';
-    overlay.style.transition = 'all 0.3s ease';
-    overlay.style.animation = 'positivity-pulse 1.5s ease-in-out infinite';
+    // overlay.style.backdropFilter = 'blur(8px)';
+    // overlay.style.WebkitBackdropFilter = 'blur(8px)';
+    // overlay.style.backgroundColor = 'var(--pf-overlay-bg, rgba(230, 230, 230, 0.4))';
+    // overlay.style.zIndex = '999998';
+    // overlay.style.pointerEvents = 'none';
+    // overlay.style.transition = 'all 0.3s ease';
+    // overlay.style.animation = 'positivity-pulse 1.5s ease-in-out infinite';
 
     const spinner = document.createElement('div');
     const iconUrl = chrome.runtime.getURL("asset/posstive-filter-png.png");

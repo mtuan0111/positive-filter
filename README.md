@@ -62,6 +62,10 @@ Every time the filter removes something, it's logged for you to review.
 2. See a running count and a list of recently filtered items (with timestamp and site).
 3. Click **Clear Log** to reset the count and history.
 
+## Feedback & Support
+
+Have suggestions or found a bug? The bottom of the popup has a **Send Feedback** link that opens a pre-addressed email to **mtuan.0111@gmail.com** — feel free to reach out with bug reports, feature requests, or general feedback.
+
 ## Privacy Policy
 
 *Last updated: 2026-07-28*

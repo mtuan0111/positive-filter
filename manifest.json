@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Positivity Circle",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Securely filters negative text on web pages completely offline using Chrome's built-in Gemini Nano AI.",
   "permissions": [
     "storage",
