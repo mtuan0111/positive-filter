@@ -235,14 +235,28 @@
 
   <div class="section">
     <h4>2. Active Websites</h4>
-    <p class="hint">The filter only runs on these specific websites:</p>
-    <div style="display:flex; gap:5px; margin-top:10px;">
-      <input type="text" id="urlInput" placeholder="example.com" style="margin-top:0;">
-      <button id="addUrlBtn" style="margin-top:0; width:50px;" title="Add" aria-label="Add"><svg class="fa-icon" viewBox="0 0 448 512"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg></button>
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
+      <span class="hint" style="margin: 0; font-weight: 500; color: var(--pf-text);">Enable for All Websites</span>
+      <label class="switch" title="Run the filter on every website instead of a specific list">
+        <input type="checkbox" id="allSitesToggle">
+        <span class="slider round"></span>
+      </label>
     </div>
-    <button id="addCurrentBtn"><svg class="fa-icon" viewBox="0 0 512 512"><path d="M256 0c17.7 0 32 14.3 32 32V66.7C355.5 80.4 431.6 156.5 445.3 224H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H445.3C431.6 355.5 355.5 431.6 288 445.3V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V445.3C156.5 431.6 80.4 355.5 66.7 288H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H66.7C80.4 156.5 156.5 80.4 224 66.7V32c0-17.7 14.3-32 32-32zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z"/></svg>Add Current Tab</button>
-    <p id="urlStatus" class="hint" style="color:red;"></p>
-    <ul id="urlList"></ul>
+    <p id="allSitesNote" class="hint"
+      style="margin-top:8px; padding: 6px; background: var(--pf-warning-bg); border-radius: 4px; color: var(--pf-warning); display:none;">
+      The filter is active on every website. Turn this off to choose specific sites instead.
+    </p>
+
+    <div id="siteListSection">
+      <p class="hint" style="margin-top:10px;">Or, the filter only runs on these specific websites:</p>
+      <div style="display:flex; gap:5px; margin-top:10px;">
+        <input type="text" id="urlInput" placeholder="example.com" style="margin-top:0;">
+        <button id="addUrlBtn" style="margin-top:0; width:50px;" title="Add" aria-label="Add"><svg class="fa-icon" viewBox="0 0 448 512"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg></button>
+      </div>
+      <button id="addCurrentBtn"><svg class="fa-icon" viewBox="0 0 512 512"><path d="M256 0c17.7 0 32 14.3 32 32V66.7C355.5 80.4 431.6 156.5 445.3 224H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H445.3C431.6 355.5 355.5 431.6 288 445.3V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V445.3C156.5 431.6 80.4 355.5 66.7 288H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H66.7C80.4 156.5 156.5 80.4 224 66.7V32c0-17.7 14.3-32 32-32zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z"/></svg>Add Current Tab</button>
+      <p id="urlStatus" class="hint" style="color:red;"></p>
+      <ul id="urlList"></ul>
+    </div>
   </div>
 
   <hr style="margin: 15px 0;">

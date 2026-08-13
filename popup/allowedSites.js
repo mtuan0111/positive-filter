@@ -17,6 +17,25 @@ export function initAllowedSites() {
   const addCurrentBtn = document.getElementById('addCurrentBtn');
   const urlList = document.getElementById('urlList');
   const urlStatus = document.getElementById('urlStatus');
+  const allSitesToggle = document.getElementById('allSitesToggle');
+  const siteListSection = document.getElementById('siteListSection');
+  const allSitesNote = document.getElementById('allSitesNote');
+
+  function applyAllSitesUi(enabled) {
+    siteListSection.style.display = enabled ? 'none' : 'block';
+    allSitesNote.style.display = enabled ? 'block' : 'none';
+  }
+
+  chrome.storage.local.get(['allSitesEnabled'], (result) => {
+    const enabled = result.allSitesEnabled === true;
+    allSitesToggle.checked = enabled;
+    applyAllSitesUi(enabled);
+  });
+
+  allSitesToggle.addEventListener('change', (e) => {
+    const enabled = e.target.checked;
+    chrome.storage.local.set({ allSitesEnabled: enabled }, () => applyAllSitesUi(enabled));
+  });
 
   function showUrlStatus(message) {
     urlStatus.textContent = message;

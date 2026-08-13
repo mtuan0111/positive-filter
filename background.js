@@ -33,7 +33,7 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 chrome.runtime.onStartup.addListener(syncContentScripts);
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === "local" && changes.allowedUrls) syncContentScripts();
+  if (area === "local" && (changes.allowedUrls || changes.allSitesEnabled)) syncContentScripts();
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
