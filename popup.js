@@ -210,7 +210,7 @@ async function checkNanoStatus() {
       } else {
         optIcon.textContent = '⚠️';
         statusEl.textContent = 'Optimization Guide is not ready yet. Please ensure it is set to "Enabled BypassPerfRequirement". If you just enabled it, Chrome may still be downloading the model.';
-        statusEl.style.color = 'orange';
+        statusEl.style.color = 'var(--pf-primary)';
         setNotReadyUi();
       }
     } else {
