@@ -1,8 +1,8 @@
-# Positivity Circle
+# ScrollClean
 
 A privacy-first Chrome Extension that uses Chrome's built-in on-device AI (Gemini Nano) to scan text on web pages and filter out negative, toxic, or low-value content in real time. Because it runs 100% locally on your machine, your reading data never leaves your device.
 
-![Positivity Circle Logo](asset/posstive-filter-png.png)
+![ScrollClean Logo](asset/watermarked_img_8969727160137344162.png)
 
 ## Features
 
@@ -10,7 +10,7 @@ A privacy-first Chrome Extension that uses Chrome's built-in on-device AI (Gemin
 - **Dynamic Content Filtering**: Automatically scans and removes toxic content, clickbait, and engagement-bait as you scroll.
 - **Custom AI Rules**: Define exactly what "negative" means to you using your own custom prompt rules.
 - **Targeted Activation**: Only runs on the specific websites you choose, preserving performance on other sites — a handful of common social sites (Facebook, X/Twitter, Instagram, Quora, TikTok) are pre-added by default on install, and you can add/remove sites freely.
-- **Visual Feedback**: Shows a pulsing blur overlay while content is being analyzed, a quick "✅" badge when something checks out clean, and a smooth collapse animation when negative content is removed.
+- **Visual Feedback**: Shows a pulsing blur overlay while content is being analyzed, a quick "✓ Clean" badge when something checks out clean, and a smooth collapse animation when negative content is removed.
 - **Blocked Content Log**: Keeps a running count and recent history of what's been filtered out, viewable (and clearable) right in the popup.
 
 ## Installation
@@ -31,7 +31,7 @@ This extension is currently installed manually via Chrome Developer Mode.
 For the extension to work locally, you must enable Chrome's experimental AI features. 
 
 1. Click on the extension icon in your toolbar to open the popup.
-2. Under the **1. AI Setup** section, click the two buttons to open the required Chrome flags:
+2. Under the **Chrome AI** section, click the two buttons to open the required Chrome flags:
    - **Optimization Guide**: Set to `Enabled BypassPerfRequirement`
    - **Prompt API**: Set to `Enabled`
 3. **IMPORTANT:** Completely close all Chrome windows and restart the browser for the flags to take effect.
@@ -42,7 +42,7 @@ For the extension to work locally, you must enable Chrome's experimental AI feat
 To save system resources, the filter only runs on websites you explicitly allow.
 
 1. Navigate to a website where you want to filter negativity (e.g., a news site or social media feed).
-2. Open the extension popup and click **Add Current Tab** under the **2. Active Websites** section.
+2. Open the extension popup and click **Add Current Tab** under the **Websites** section.
 3. Alternatively, you can type a domain manually (e.g., `x.com`) and click **Add**.
 4. Adding a domain automatically covers all its subdomains too (e.g. adding `facebook.com` also matches `m.facebook.com`, `www.facebook.com`, etc.), so you don't need to add each one separately.
 
@@ -50,7 +50,7 @@ To save system resources, the filter only runs on websites you explicitly allow.
 
 You can tell the AI exactly what to look for.
 
-1. In the extension popup, go to **3. Custom AI Rules**.
+1. In the extension popup, go to **Rules**.
 2. Type in your custom criteria (e.g., "Filter out any posts about politics or natural disasters").
 3. Click **Save Prompt**. The AI will now use your custom rules to evaluate content on your active websites. (Saving or resetting the prompt also clears previously cached results, since old verdicts were made under the old rules.)
 
@@ -58,7 +58,7 @@ You can tell the AI exactly what to look for.
 
 Every time the filter removes something, it's logged for you to review.
 
-1. Open the extension popup and scroll to **4. Blocked Content**.
+1. Open the extension popup and scroll to **Blocked**.
 2. See a running count and a list of recently filtered items (with timestamp and site).
 3. Click **Clear Log** to reset the count and history.
 

@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Positivity Circle",
+  "name": "ScrollClean",
   "version": "1.2",
   "description": "Securely filters negative text on web pages completely offline using Chrome's built-in Gemini Nano AI.",
   "permissions": [
@@ -14,20 +14,20 @@
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "asset/posstive-filter-png.png",
-      "48": "asset/posstive-filter-png.png",
-      "128": "asset/posstive-filter-png.png"
+      "16": "asset/watermarked_img_8969727160137344162.png",
+      "48": "asset/watermarked_img_8969727160137344162.png",
+      "128": "asset/watermarked_img_8969727160137344162.png"
     }
   },
   "icons": {
-    "16": "asset/posstive-filter-png.png",
-    "48": "asset/posstive-filter-png.png",
-    "128": "asset/posstive-filter-png.png"
+    "16": "asset/watermarked_img_8969727160137344162.png",
+    "48": "asset/watermarked_img_8969727160137344162.png",
+    "128": "asset/watermarked_img_8969727160137344162.png"
   },
   "web_accessible_resources": [
     {
       "resources": [
-        "asset/posstive-filter-png.png"
+        "asset/watermarked_img_8969727160137344162.png"
       ],
       "matches": [
         "<all_urls>"

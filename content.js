@@ -103,8 +103,8 @@ Look specifically for:
     // overlay.style.animation = 'positivity-pulse 1.5s ease-in-out infinite';
 
     const spinner = document.createElement('div');
-    const iconUrl = chrome.runtime.getURL("asset/posstive-filter-png.png");
-    spinner.innerHTML = `<img src="${iconUrl}" style="width: 16px; height: 16px; border-radius: 3px;"> Clarifying... <span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span>`;
+    const iconUrl = chrome.runtime.getURL("asset/watermarked_img_8969727160137344162.png");
+    spinner.innerHTML = `<img src="${iconUrl}" style="width: 16px; height: 16px; border-radius: 4px;"> Cleaning <span style="display:inline-block; width:10px; height:10px; border:2px solid #243552; border-top-color:#3cc8e8; border-radius:50%; animation: spin 0.8s linear infinite;"></span>`;
     spinner.style.position = 'absolute';
     spinner.style.display = 'flex';
     spinner.style.alignItems = 'center';
@@ -112,14 +112,15 @@ Look specifically for:
     spinner.style.top = '10px';
     spinner.style.left = '10px';
     spinner.style.zIndex = '999999';
-    spinner.style.background = 'var(--pf-spinner-bg, rgba(255, 255, 255, 0.9))';
-    spinner.style.color = 'var(--pf-text, #333)';
+    spinner.style.background = '#0b1426';
+    spinner.style.color = '#e6edf7';
+    spinner.style.border = '1px solid #243552';
     spinner.style.padding = '4px 8px';
-    spinner.style.borderRadius = '4px';
-    spinner.style.fontSize = '14px';
+    spinner.style.borderRadius = '6px';
+    spinner.style.fontSize = '12px';
     spinner.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
-    spinner.style.fontWeight = 'bold';
-    spinner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+    spinner.style.fontWeight = '600';
+    spinner.style.boxShadow = '0 1px 3px rgba(0,0,0,0.3)';
 
     // Add keyframes for the spinner and skeleton if not already added
     if (!document.getElementById('positivity-animation-style')) {
@@ -197,9 +198,10 @@ Look specifically for:
         overlay.style.WebkitBackdropFilter = 'none';
         overlay.style.backgroundColor = 'transparent';
 
-        spinner.innerHTML = '<span style="font-size: 14px;">✅</span>';
-        spinner.style.color = 'var(--pf-success-dark, #155724)';
-        spinner.style.background = 'var(--pf-success-bg, #d4edda)';
+        spinner.innerHTML = '<span style="font-size: 12px;">✓ Clean</span>';
+        spinner.style.color = '#4cc9a0';
+        spinner.style.background = '#0f2a27';
+        spinner.style.borderColor = '#4cc9a0';
 
         setTimeout(() => {
           if (overlay.parentNode) overlay.remove();

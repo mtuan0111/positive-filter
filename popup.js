@@ -40,7 +40,7 @@ function initBlockedLog() {
     countEl.textContent = count || 0;
     
     if (!log || log.length === 0) {
-      listEl.innerHTML = '<em style="color: #999;">No content blocked yet.</em>';
+      listEl.innerHTML = '<em style="color: var(--pf-text-muted);">No content blocked yet.</em>';
       return;
     }
 
@@ -49,11 +49,11 @@ function initBlockedLog() {
       const div = document.createElement('div');
       div.style.marginBottom = '8px';
       div.style.paddingBottom = '8px';
-      div.style.borderBottom = '1px solid #eee';
+      div.style.borderBottom = '1px solid var(--pf-border)';
       
       const timeStr = new Date(item.timestamp).toLocaleTimeString();
-      const domainStr = item.domain ? ` <span style="color: #666; font-size: 10px;">(${item.domain})</span>` : '';
-      div.innerHTML = `<strong style="color: #e65100;">${timeStr}</strong>${domainStr} - ${item.text}`;
+      const domainStr = item.domain ? ` <span style="color: var(--pf-text-muted); font-size: 10px;">(${item.domain})</span>` : '';
+      div.innerHTML = `<strong style="color: var(--pf-warning);">${timeStr}</strong>${domainStr} - ${item.text}`;
       listEl.appendChild(div);
     });
   }
@@ -132,7 +132,7 @@ Prompt to evaluate:
         const response = await nanoSession.prompt(verificationPrompt);
         
         if (response.toLowerCase().includes("invalid")) {
-          statusEl.textContent = 'Invalid prompt! Must define negative content.';
+          statusEl.textContent = 'Rule must describe negative content.';
           statusEl.style.color = 'var(--pf-warning)';
           statusEl.style.display = 'block';
           setTimeout(() => statusEl.style.display = 'none', 4000);
@@ -168,9 +168,9 @@ Prompt to evaluate:
   shareBtn.addEventListener('click', () => {
     const val = promptInput.value.trim() || DEFAULT_PROMPT;
     navigator.clipboard.writeText(val).then(() => {
-      const originalText = shareBtn.textContent;
-      shareBtn.textContent = 'Copied to Clipboard!';
-      setTimeout(() => shareBtn.textContent = originalText, 2000);
+      const originalHtml = shareBtn.innerHTML;
+      shareBtn.textContent = 'Copied';
+      setTimeout(() => shareBtn.innerHTML = originalHtml, 2000);
     }).catch(err => {
       console.error('Could not copy text: ', err);
     });
@@ -182,48 +182,58 @@ async function checkNanoStatus() {
   const optIcon = document.getElementById('optIcon');
   const statusEl = document.getElementById('nanoStatus');
   const restartNote = document.getElementById('restartNote');
-  const disableTip = document.getElementById('disableTip');
+  const aiSetup = document.getElementById('aiSetup');
+  const summaryDot = document.getElementById('aiSummaryDot');
+  const summaryText = document.getElementById('aiSummaryText');
+
+  const setDot = (el, state) => { el.className = 'dot' + (state ? ' ' + state : ''); };
+  const setSummary = (state, text) => {
+    setDot(summaryDot, state);
+    summaryText.textContent = text;
+  };
 
   const setNotReadyUi = () => {
     restartNote.style.display = 'block';
-    disableTip.style.display = 'none';
+    aiSetup.open = true; // needs attention, so keep the setup steps visible
   };
 
   try {
     if (window.LanguageModel) {
-      promptIcon.textContent = '✅';
+      setDot(promptIcon, 'ok');
 
       let isReady = 'no';
       if (typeof window.LanguageModel.availability === 'function') {
-        const availability = await window.LanguageModel.availability();
-        isReady = availability;
+        isReady = await window.LanguageModel.availability();
       } else if (typeof window.canCreateTextSession === 'function') {
         isReady = await window.canCreateTextSession();
       }
 
       if (isReady === 'available' || isReady === 'readily' || isReady === 'after-download') {
-        optIcon.textContent = '✅';
-        statusEl.textContent = 'Gemini Nano is ready to use!';
-        statusEl.style.color = 'green';
+        setDot(optIcon, 'ok');
+        statusEl.textContent = '';
         restartNote.style.display = 'none';
-        disableTip.style.display = 'block';
+        setSummary('ok', 'Ready');
+        aiSetup.open = false; // collapse once everything works
       } else {
-        optIcon.textContent = '⚠️';
-        statusEl.textContent = 'Optimization Guide is not ready yet. Please ensure it is set to "Enabled BypassPerfRequirement". If you just enabled it, Chrome may still be downloading the model.';
+        setDot(optIcon, 'warn');
+        statusEl.textContent = 'Model not ready. Check that Optimization Guide is set as shown above. Chrome may still be downloading it.';
         statusEl.style.color = 'var(--pf-primary)';
+        setSummary('warn', 'Not ready');
         setNotReadyUi();
       }
     } else {
-      promptIcon.textContent = '⚠️';
-      optIcon.textContent = '⚠️';
-      statusEl.textContent = 'Prompt API is not detected. Please ensure it is set to "Enabled" and restart Chrome.';
-      statusEl.style.color = 'red';
+      setDot(promptIcon, 'warn');
+      setDot(optIcon, 'warn');
+      statusEl.textContent = 'Prompt API not detected. Enable it, then restart Chrome.';
+      statusEl.style.color = 'var(--pf-danger)';
+      setSummary('warn', 'Setup needed');
       setNotReadyUi();
     }
   } catch (e) {
-    optIcon.textContent = '⚠️';
+    setDot(optIcon, 'warn');
     statusEl.textContent = `Error checking status: ${e.message}`;
-    statusEl.style.color = 'red';
+    statusEl.style.color = 'var(--pf-danger)';
+    setSummary('warn', 'Status check failed');
     setNotReadyUi();
     console.error(e);
   }
