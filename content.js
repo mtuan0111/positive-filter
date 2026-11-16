@@ -9,6 +9,44 @@ async function hashText(text) {
   return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
+// Finds the feed item / post / article to act on for a given element.
+function findContainer(el) {
+  let target = el.closest(
+    '[role="article"], article, .post, .tweet, .card, .feed-item, li, ' +
+    // Quora bundles
+    '[class*="dom_annotate_multifeed_bundle"]'
+  );
+  if (!target) {
+    // Fallback: get the closest major container, or just the parent
+    target = el.closest('div, section') || el.parentElement || el;
+  }
+  return target;
+}
+
+// Marks a container as blocked and animates it collapsed before removing it.
+function collapseAndRemove(target) {
+  target.dataset.positivityBlurred = "true";
+
+  target.style.transition = 'all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)';
+  target.style.overflow = 'hidden';
+  target.style.height = target.offsetHeight + 'px';
+
+  // Force reflow
+  target.offsetHeight;
+
+  target.style.height = '0px';
+  target.style.paddingTop = '0px';
+  target.style.paddingBottom = '0px';
+  target.style.marginTop = '0px';
+  target.style.marginBottom = '0px';
+  target.style.opacity = '0';
+  target.style.border = 'none';
+
+  setTimeout(() => {
+    target.remove();
+  }, 400);
+}
+
 // A simple function to scan paragraphs. In a real app, you'd want to optimize this
 // so you don't hit API rate limits by scanning hundreds of elements at once.
 async function scanPage() {
@@ -68,15 +106,7 @@ Look specifically for:
     if (text.length < 20) continue; // Skip very short text
 
     // Find a suitable container to blur (like a feed item, article, or post)
-    let target = el.closest(
-      '[role="article"], article, .post, .tweet, .card, .feed-item, li, ' +
-      // Quora bundles
-      '[class*="dom_annotate_multifeed_bundle"]'
-    );
-    if (!target) {
-      // Fallback: get the closest major container, or just the parent
-      target = el.closest('div, section') || el.parentElement || el;
-    }
+    const target = findContainer(el);
 
     if (target.dataset.positivityBlurred || target.dataset.positivityChecking) continue;
 
@@ -162,26 +192,7 @@ Look specifically for:
     target.appendChild(overlay);
 
     const handleNegative = () => {
-      target.dataset.positivityBlurred = "true";
-
-      target.style.transition = 'all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)';
-      target.style.overflow = 'hidden';
-      target.style.height = target.offsetHeight + 'px';
-
-      // Force reflow
-      target.offsetHeight;
-
-      target.style.height = '0px';
-      target.style.paddingTop = '0px';
-      target.style.paddingBottom = '0px';
-      target.style.marginTop = '0px';
-      target.style.marginBottom = '0px';
-      target.style.opacity = '0';
-      target.style.border = 'none';
-
-      setTimeout(() => {
-        target.remove();
-      }, 400);
+      collapseAndRemove(target);
 
       newlyBlocked.push({
         text: text.length > 100 ? text.substring(0, 100) + "..." : text,
@@ -310,3 +321,292 @@ window.addEventListener('scroll', debouncedScanPage, { passive: true });
 // right time (e.g. IntersectionObserver-driven loads), so also watch the DOM directly.
 const lazyLoadObserver = new MutationObserver(debouncedScanPage);
 lazyLoadObserver.observe(document.body, { childList: true, subtree: true });
+
+// ---------------------------------------------------------------------------
+// Right-click "Report as toxic": summarize the content into a general rule with
+// Nano, append it (with source host + time) to the custom prompt, and hide it.
+// ---------------------------------------------------------------------------
+const DEFAULT_PROMPT_TEXT = `Analyze the following text. Act as an expert Trust and Safety Content Moderator. Analyze the following text and determine if it contains any harmful elements.
+
+Look specifically for:
+1. Toxicity: Insults, hate speech, harassment, profanity, or aggressive tone.
+2. Distressing Content: Violence, self-harm references, or extreme negativity/doomscrolling material.
+3. Clickbait: Sensationalized language, exaggerated claims, or intentionally withholding key information to force a click.
+4. Manipulative Engagement-Bait: Guilt-tripping, fear-mongering, forced sharing (e.g., 'share if you care'), or false urgency.`;
+
+let lastContextTarget = null;
+document.addEventListener('contextmenu', (e) => {
+  lastContextTarget = e.target instanceof Element ? e.target : null;
+}, true);
+
+function formatReportTime(d = new Date()) {
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function showToast(message, undoFn) {
+  const old = document.getElementById('scrollclean-toast');
+  if (old) old.remove();
+
+  const toast = document.createElement('div');
+  toast.id = 'scrollclean-toast';
+  toast.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:2147483647;display:flex;align-items:center;gap:10px;' +
+    'background:#0b1426;color:#e6edf7;border:1px solid #243552;border-left:3px solid #3cc8e8;border-radius:6px;' +
+    'padding:8px 12px;font:600 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;' +
+    'box-shadow:0 2px 8px rgba(0,0,0,0.35);';
+  const label = document.createElement('span');
+  label.textContent = message;
+  toast.appendChild(label);
+
+  if (undoFn) {
+    const undo = document.createElement('button');
+    undo.textContent = 'Undo';
+    undo.style.cssText = 'background:none;border:none;color:#3cc8e8;font:inherit;cursor:pointer;padding:0;';
+    undo.addEventListener('click', async () => {
+      await undoFn();
+      toast.remove();
+    });
+    toast.appendChild(undo);
+  }
+
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 8000);
+}
+
+async function clearResultCaches() {
+  const items = await chrome.storage.local.get(null);
+  const keys = Object.keys(items).filter(k => k.startsWith('nanoCache_') || k.startsWith('textCache_'));
+  if (keys.length) await chrome.storage.local.remove(keys);
+}
+
+async function summarizeToRule(text) {
+  if (!window.LanguageModel) return null;
+  const availability = await window.LanguageModel.availability();
+  if (availability !== 'available') return null;
+
+  const session = await window.LanguageModel.create();
+  try {
+    const reply = await session.prompt(
+      'You write content-filter rules. Read the text and reply with ONE short sentence describing the TYPE of harmful content it is ' +
+      '(for example harassment, fear-mongering, clickbait). Be general. Do not quote the text, name people, or include personal data. ' +
+      'If it is not harmful, reply NONE.\n\nText:\n```' + text + '```'
+    );
+    return reply;
+  } finally {
+    session.destroy();
+  }
+}
+
+function sanitizeRule(raw) {
+  if (!raw) return null;
+  let rule = raw.split('\n')[0].replace(/[`"]/g, '').trim();
+  if (!rule || /^none\b/i.test(rule)) return null;
+  rule = rule.replace(/\.+$/, '');
+  if (rule.length > 150) rule = rule.slice(0, 150).trim();
+  return rule;
+}
+
+async function handleReportToxic() {
+  if (!chrome.runtime?.id) return;
+
+  const selection = window.getSelection().toString().trim();
+  // Prefer the selection's own element (works for the button and the keyboard shortcut,
+  // where there was no right-click); fall back to the last right-clicked element.
+  let target = lastContextTarget;
+  if (selection) {
+    const node = window.getSelection().anchorNode;
+    const el = node && (node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement);
+    if (el) target = el;
+  }
+  hideReportButton();
+  const container = target ? findContainer(target) : null;
+
+  let text = selection || (container && container.innerText ? container.innerText.trim() : '');
+  if (!text) {
+    showToast('Nothing to report here');
+    return;
+  }
+  text = text.slice(0, 1000);
+
+  let rule;
+  try {
+    rule = sanitizeRule(await summarizeToRule(text));
+    if (rule === null && !(window.LanguageModel && (await window.LanguageModel.availability()) === 'available')) {
+      showToast('Chrome AI is not ready');
+      return;
+    }
+  } catch (e) {
+    console.warn('Report: Nano failed', e);
+    showToast('Chrome AI is not ready');
+    return;
+  }
+
+  if (!rule) {
+    showToast("Doesn't look toxic");
+    return;
+  }
+
+  const { customPrompt } = await chrome.storage.local.get(['customPrompt']);
+  const base = customPrompt || DEFAULT_PROMPT_TEXT;
+  const ruleLine = `Also treat as negative: ${rule}.`;
+
+  let appended = null;
+  if (!base.includes(ruleLine)) {
+    appended = `\n\n${ruleLine}\n(Reported from ${window.location.hostname} on ${formatReportTime()})`;
+    await chrome.storage.local.set({ customPrompt: base + appended });
+    await clearResultCaches();
+  }
+
+  // Hide the reported content right away and log it like any other blocked item.
+  const blockTarget = container || target;
+  if (blockTarget && blockTarget !== document.body && blockTarget !== document.documentElement) {
+    collapseAndRemove(blockTarget);
+  }
+  const entry = {
+    text: text.length > 100 ? text.substring(0, 100) + '...' : text,
+    timestamp: Date.now(),
+    domain: window.location.hostname
+  };
+  const { blockedCount = 0, blockedLog = [] } = await chrome.storage.local.get(['blockedCount', 'blockedLog']);
+  await chrome.storage.local.set({ blockedCount: blockedCount + 1, blockedLog: [entry, ...blockedLog].slice(0, 50) });
+
+  showToast('Reported. Rule added.', appended ? async () => {
+    const { customPrompt: current } = await chrome.storage.local.get(['customPrompt']);
+    if (current && current.includes(appended)) {
+      await chrome.storage.local.set({ customPrompt: current.replace(appended, '') });
+      await clearResultCaches();
+    }
+  } : null);
+}
+
+chrome.runtime.onMessage.addListener((request) => {
+  if (request && request.action === 'reportToxic') handleReportToxic();
+});
+
+
+// ---------------------------------------------------------------------------
+// Floating "Report" button shown beside selected text (setting: showReportButton).
+// Lives in a shadow root so page CSS can't affect it.
+// ---------------------------------------------------------------------------
+let reportButtonHost = null;
+let reportShortcut = null; // fetched once from background (reflects user remaps on next page load)
+
+function getReportShortcut() {
+  if (reportShortcut !== null) return Promise.resolve(reportShortcut);
+  return new Promise((resolve) => {
+    try {
+      chrome.runtime.sendMessage({ action: 'getReportShortcut' }, (res) => {
+        const _ = chrome.runtime.lastError;
+        reportShortcut = (res && res.shortcut) || '';
+        resolve(reportShortcut);
+      });
+    } catch (e) {
+      resolve('');
+    }
+  });
+}
+
+function buildReportButton(shortcut) {
+  const host = document.createElement('div');
+  host.id = 'scrollclean-report-btn';
+  host.style.cssText = 'position:absolute;z-index:2147483647;top:0;left:0;';
+  const root = host.attachShadow({ mode: 'open' });
+  root.innerHTML = `
+    <style>
+      button {
+        all: initial;
+        display: inline-flex; align-items: center; gap: 6px;
+        background: #0b1426; color: #e6edf7;
+        border: 1px solid #243552; border-radius: 6px;
+        padding: 5px 9px; cursor: pointer;
+        font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+      }
+      button:hover { border-color: #3cc8e8; }
+      svg { width: 13px; height: 13px; color: #3cc8e8; }
+      kbd {
+        font: 500 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        color: #8b9bb5; border: 1px solid #243552; border-radius: 3px; padding: 0 4px;
+      }
+    </style>
+    <button type="button" title="Report selection as toxic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>
+      <span>Report</span>
+      ${shortcut ? `<kbd>${shortcut.replace(/</g, '')}</kbd>` : ''}
+    </button>`;
+  const btn = root.querySelector('button');
+  // Keep the text selection alive when the button is pressed.
+  btn.addEventListener('mousedown', (e) => e.preventDefault());
+  btn.addEventListener('click', () => handleReportToxic());
+  return host;
+}
+
+function hideReportButton() {
+  if (reportButtonHost) {
+    reportButtonHost.remove();
+    reportButtonHost = null;
+  }
+}
+
+async function updateReportButton() {
+  if (!chrome.runtime?.id) return;
+  const sel = window.getSelection();
+  const text = sel ? sel.toString().trim() : '';
+  if (!sel || sel.rangeCount === 0 || text.length < 3) {
+    hideReportButton();
+    return;
+  }
+
+  // Skip text being edited (inputs, textareas, contenteditable).
+  const anchor = sel.anchorNode && (sel.anchorNode.nodeType === Node.ELEMENT_NODE ? sel.anchorNode : sel.anchorNode.parentElement);
+  if (anchor && (anchor.closest('input, textarea, [contenteditable=""], [contenteditable="true"]') ||
+      anchor.closest('#scrollclean-toast'))) {
+    hideReportButton();
+    return;
+  }
+
+  const { showReportButton } = await chrome.storage.local.get(['showReportButton']);
+  if (showReportButton === false) {
+    hideReportButton();
+    return;
+  }
+
+  const rects = sel.getRangeAt(0).getClientRects();
+  if (!rects.length) return;
+  const last = rects[rects.length - 1];
+
+  const shortcut = await getReportShortcut();
+  if (!reportButtonHost) {
+    reportButtonHost = buildReportButton(shortcut);
+    document.body.appendChild(reportButtonHost);
+  }
+
+  // Absolute page coordinates, placed just after the end of the selection.
+  const hostWidth = reportButtonHost.offsetWidth || 130;
+  let left = last.right + window.scrollX + 8;
+  const maxLeft = window.scrollX + document.documentElement.clientWidth - hostWidth - 8;
+  if (left > maxLeft) left = Math.max(window.scrollX + 8, maxLeft);
+  const top = last.top + window.scrollY - 4;
+  reportButtonHost.style.left = left + 'px';
+  reportButtonHost.style.top = top + 'px';
+}
+
+// Capture phase so sites that stop propagation of mouse/key events can't swallow them.
+function scheduleReportButtonUpdate() {
+  setTimeout(() => updateReportButton().catch((e) => console.warn('ScrollClean report button:', e)), 0);
+}
+document.addEventListener('mouseup', scheduleReportButtonUpdate, true);
+document.addEventListener('keyup', (e) => {
+  if (e.key === 'Shift' || (e.key && e.key.startsWith('Arrow'))) scheduleReportButtonUpdate();
+}, true);
+document.addEventListener('selectionchange', () => {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) hideReportButton();
+});
+document.addEventListener('mousedown', (e) => {
+  if (reportButtonHost && !e.composedPath().includes(reportButtonHost)) hideReportButton();
+}, true);
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes.showReportButton && changes.showReportButton.newValue === false) hideReportButton();
+});

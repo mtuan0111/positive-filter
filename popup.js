@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAllowedSites();
   checkNanoStatus();
   initMasterToggle();
+  initReportButtonToggle();
 
   document.getElementById('flagOptimizationBtn').addEventListener('click', () => {
     chrome.tabs.create({ url: 'chrome://flags/#optimization-guide-on-device-model' });
@@ -16,6 +17,16 @@ document.addEventListener('DOMContentLoaded', () => {
   initCustomPrompt();
   initBlockedLog();
 });
+
+function initReportButtonToggle() {
+  const toggle = document.getElementById('reportBtnToggle');
+  chrome.storage.local.get(['showReportButton'], (result) => {
+    toggle.checked = result.showReportButton !== false;
+  });
+  toggle.addEventListener('change', (e) => {
+    chrome.storage.local.set({ showReportButton: e.target.checked });
+  });
+}
 
 function initMasterToggle() {
   const masterToggle = document.getElementById('masterToggle');
@@ -92,6 +103,13 @@ function initCustomPrompt() {
   // Load existing
   chrome.storage.local.get(['customPrompt'], (result) => {
     promptInput.value = result.customPrompt || DEFAULT_PROMPT;
+  });
+
+  // Keep the box in sync when a rule is added/undone via the right-click "Report as toxic".
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && changes.customPrompt && document.activeElement !== promptInput) {
+      promptInput.value = changes.customPrompt.newValue || DEFAULT_PROMPT;
+    }
   });
 
   function clearCache() {

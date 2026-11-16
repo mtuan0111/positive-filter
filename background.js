@@ -10,6 +10,26 @@ const DEFAULT_SITES = [
   "*://*.tiktok.com/*"
 ];
 
+const REPORT_MENU_ID = "scrollclean-report-toxic";
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.create({
+      id: REPORT_MENU_ID,
+      title: "Report as toxic (ScrollClean)",
+      contexts: ["page", "selection", "link", "image"]
+    });
+  });
+});
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId !== REPORT_MENU_ID || !tab?.id) return;
+  // Pages where the content script isn't running have no receiver; ignore that error.
+  chrome.tabs.sendMessage(tab.id, { action: "reportToxic" }, () => {
+    const _ = chrome.runtime.lastError;
+  });
+});
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.local.get(['allowedUrls'], (result) => {
     if (result.allowedUrls === undefined) {
@@ -36,7 +56,23 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "local" && (changes.allowedUrls || changes.allSitesEnabled)) syncContentScripts();
 });
 
+chrome.commands.onCommand.addListener((command, tab) => {
+  if (command !== "report-toxic") return;
+  const send = (tabId) => chrome.tabs.sendMessage(tabId, { action: "reportToxic" }, () => {
+    const _ = chrome.runtime.lastError;
+  });
+  if (tab?.id) send(tab.id);
+  else chrome.tabs.query({ active: true, currentWindow: true }, ([t]) => t?.id && send(t.id));
+});
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "getReportShortcut") {
+    chrome.commands.getAll((commands) => {
+      const cmd = commands.find((c) => c.name === "report-toxic");
+      sendResponse({ shortcut: cmd?.shortcut || "" });
+    });
+    return true;
+  }
   if (request.action === "checkText") {
     classifyText(request.text).then((response) => {
       // If the content script's tab was closed/reloaded before this finished,

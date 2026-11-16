@@ -6,11 +6,21 @@
   "permissions": [
     "storage",
     "scripting",
-    "activeTab"
+    "activeTab",
+    "contextMenus"
   ],
   "host_permissions": [
     "<all_urls>"
   ],
+  "commands": {
+    "report-toxic": {
+      "suggested_key": {
+        "default": "Alt+Shift+R",
+        "mac": "Alt+Shift+R"
+      },
+      "description": "Report selected text or post as toxic"
+    }
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

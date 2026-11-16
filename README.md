@@ -11,6 +11,7 @@ A privacy-first Chrome Extension that uses Chrome's built-in on-device AI (Gemin
 - **Custom AI Rules**: Define exactly what "negative" means to you using your own custom prompt rules.
 - **Targeted Activation**: Only runs on the specific websites you choose, preserving performance on other sites — a handful of common social sites (Facebook, X/Twitter, Instagram, Quora, TikTok) are pre-added by default on install, and you can add/remove sites freely.
 - **Visual Feedback**: Shows a pulsing blur overlay while content is being analyzed, a quick "✓ Clean" badge when something checks out clean, and a smooth collapse animation when negative content is removed.
+- **Report as toxic (right-click)**: Right-click any post (or selected text) and choose *Report as toxic (ScrollClean)*. Chrome's on-device AI summarizes it into one general rule, which is appended to your custom prompt with the site and time, and the content is hidden. A floating **Report** button (with its shortcut, `Alt+Shift+R` by default, remappable at `chrome://extensions/shortcuts`) also appears beside selected text; turn it off with the "Report button on selection" switch under Rules. Use *Undo* in the toast, or delete the added lines in the Rules box, to reverse it.
 - **Blocked Content Log**: Keeps a running count and recent history of what's been filtered out, viewable (and clearable) right in the popup.
 
 ## Installation
@@ -83,7 +84,7 @@ Have suggestions or found a bug? The bottom of the popup has a **Send Feedback**
 
 Everything the extension keeps is stored in `chrome.storage.local` — your browser's local storage for this extension, on your device only:
 
-- **Your settings**: the list of allowed websites, your custom filtering prompt (if you set one).
+- **Your settings**: the list of allowed websites, your custom filtering prompt (if you set one). Reporting content via right-click adds a short, AI-written general rule (not the original text) plus the site and time to this prompt.
 - **Classification cache**: hashes (SHA-256) of previously-seen text mapped to a true/false negativity result, so identical text isn't re-analyzed. The cache stores a hash and a boolean, not the original text.
 - **Blocked content log**: a short (up to 100 characters), truncated excerpt of text that was flagged, along with a timestamp and the domain it was found on — kept only so you can review what the filter has removed, capped at the 50 most recent entries, and clearable anytime from the popup.
 - **Gemini API key**, only if a developer has manually added one for the cloud fallback described above.
@@ -94,6 +95,7 @@ None of this storage is synced to any account or server — it lives only in you
 
 - **`storage`**: to save your settings and caches locally, as described above.
 - **`scripting`**: to inject the content-filtering script only into the specific sites you've added to your allowed list.
+- **`contextMenus`**: to add the right-click "Report as toxic" item.
 - **`activeTab`**: to let the "Add Current Tab" button read the current tab's domain when you click it.
 - **Host permission on all sites (`<all_urls>`)**: required so the extension *can* register its content script on whatever site you choose to add — it does not scan any site you haven't explicitly allowed.
 
